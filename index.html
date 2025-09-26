@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles/styles.css" />
+    <title>ToDo List</title>
+  </head>
+  <body>
+    <header>
+      <div id="header-container">
+        <h1>My Day</h1>
+        <time id="current-day"></time>
+      </div>
+    </header>
+    <main>
+      <section id="new-section">
+        <article id="new-article">
+          <input type="text" name="" id="new-input" placeholder="New Task" />
+          <button id="new-button">Add</button>
+        </article>
+      </section>
+      <section id="todo-section">
+        <div class="section-header">
+          <h2>ToDo</h2>
+        </div>
+        <article class="todo-article">
+          <div class="completed-header">
+            <div class="status-icon"></div>
+            <h3 class="task-name">Comer</h3>
+          </div>
+        </article>
+        <article class="todo-article">
+          <div class="completed-header">
+            <div class="status-icon"></div>
+            <h3 class="task-name">Ir al Gym</h3>
+          </div>
+        </article>
+      </section>
+      <section id="done">
+        <div class="section-header">
+          <h2>Done</h2>
+        </div>
+        <article class="done-article">
+          <div class="completed-header">
+            <div class="status-icon"></div>
+            <h3 class="task-name">Estudiar</h3>
+          </div>
+        </article>
+      </section>
+    </main>
+    <script src="./script/script.js"></script>
+  </body>
+</html>
