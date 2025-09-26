@@ -1,7 +1,10 @@
-// VARIABLES
+// GLOBAL VARIABLES
 
+const todoSection = document.getElementById("todo-section");
+const doneSection = document.getElementById("done-section");
 const currentDate = document.getElementById("current-day");
 const today = new Date();
+let taskList = [];
 
 // HEADER
 
@@ -27,41 +30,46 @@ newInput.addEventListener("keydown", function (event) {
   }
 });
 
-newButton.addEventListener("click", function (event) {
+newButton.addEventListener("click", (event) => {
   event.preventDefault;
   createNewTask(newInput.value);
   newInput.value = "";
 });
 
 const createNewTask = (taskName) => {
-  const todoSection = document.getElementById("todo-section");
   let taskArticle = document.createElement("article");
   taskArticle.className = "todo-article";
   taskArticle.id = taskName;
   taskArticle.innerHTML = `
 		<div class="task-header">
-            <div class="status-icon pending"></div>
+            <div class="status-icon pending" id="${taskName}-icon"></div>
             <h3 class="task-name">${taskName}</h3>
 		</div>`;
+  taskList.push({ task: taskName, done: false });
   todoSection.appendChild(taskArticle);
-  asignEvent(taskName);
+  asignIconEvent(taskArticle, taskName);
 };
 
 // STATUS ICON
 
-// no funciona!!!!!
-
-const asignEvent = (taskName) => {
-  const statusIcon = document.getElementById(taskName);
+const asignIconEvent = (taskArticle, taskName) => {
+  const statusIcon = document.getElementById(`${taskName}-icon`);
   console.log(statusIcon);
+  console.log(doneSection);
 
-  statusIcon.addEventListener("click", function (event) {
+  statusIcon.addEventListener("click", (event) => {
     event.preventDefault();
-    console.log("Holi");
-    if (statusIcon.className == "status-icon pending") {
-      statusIcon.className = "status-icon done";
+    console.log(taskArticle);
+    if (statusIcon.classList.contains("pending")) {
+      statusIcon.classList.remove("pending");
+      statusIcon.classList.add("done");
+      todoSection.removeChild(taskArticle);
+      doneSection.appendChild(taskArticle);
     } else {
-      statusIcon.className = "status-icon pending";
+      statusIcon.classList.remove("done");
+      statusIcon.classList.add("pending");
+      doneSection.removeChild(taskArticle);
+      todoSection.appendChild(taskArticle);
     }
   });
 };
