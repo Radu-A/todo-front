@@ -136,19 +136,37 @@ h3 {
   width: 2rem;
   height: 2rem;
   border-radius: 1.8rem;
+  background-image: url("../assets/icons/circle_accent.svg");
+  background-size: cover;
 }
 
 .status-icon:hover {
   cursor: pointer;
 }
 
-.pending {
+/* .todo {
   background-image: url("../assets/icons/circle_accent.svg");
   background-size: cover;
-}
+} */
 
 .done {
   background-image: url("../assets/icons/check_accent.svg");
-  background-size: cover;
   background-color: var(--color-accent);
+}
+
+/* DONE */
+
+.delete-button {
+
+  padding: 0.3rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 0.2rem;
+  background-color: inherit;
+  font-family: inherit;
+  font-size: 1.2rem;
+  color: var(--color-accent);
+}
+
+.delete-button:hover {
+  cursor: pointer;
 }

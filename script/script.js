@@ -4,7 +4,8 @@ const todoSection = document.getElementById("todo-section");
 const doneSection = document.getElementById("done-section");
 const currentDate = document.getElementById("current-day");
 const today = new Date();
-let taskList = [];
+let taskList = JSON.parse(localStorage.getItem("taskList"));
+console.log(taskList);
 
 // HEADER
 
@@ -17,59 +18,90 @@ const formatedDate = today.toLocaleDateString("en-EN", {
 // insert date into DOM
 currentDate.textContent = formatedDate;
 
-// NEW TASK
+// CREATE TASK
 
 const newInput = document.getElementById("new-input");
 const newButton = document.getElementById("new-button");
 
-newInput.addEventListener("keydown", function (event) {
+newInput.addEventListener("keydown", (event) => {
   event.preventDefault;
   if (event.key === "Enter") {
-    createNewTask(newInput.value);
+    createTask(newInput.value, "todo");
     newInput.value = "";
   }
 });
 
 newButton.addEventListener("click", (event) => {
   event.preventDefault;
-  createNewTask(newInput.value);
+  createTask(newInput.value, "todo");
   newInput.value = "";
 });
 
-const createNewTask = (taskName) => {
+const printTask = (taskName, state) => {
   let taskArticle = document.createElement("article");
   taskArticle.className = "todo-article";
   taskArticle.id = taskName;
   taskArticle.innerHTML = `
 		<div class="task-header">
-            <div class="status-icon pending" id="${taskName}-icon"></div>
+            <div class="status-icon ${state}" id="${taskName}-icon"></div>
             <h3 class="task-name">${taskName}</h3>
 		</div>`;
-  taskList.push({ task: taskName, done: false });
-  todoSection.appendChild(taskArticle);
-  asignIconEvent(taskArticle, taskName);
+  if (state == "todo") {
+    todoSection.appendChild(taskArticle);
+  } else {
+    doneSection.appendChild(taskArticle);
+  }
+  asingState(taskArticle, taskName);
 };
 
-// STATUS ICON
+const createTask = (taskName, state) => {
+  taskList.push([taskName, state]);
+  localStorage.setItem("taskList", JSON.stringify(taskList));
+  printTask(taskName, state);
+};
 
-const asignIconEvent = (taskArticle, taskName) => {
-  const statusIcon = document.getElementById(`${taskName}-icon`);
-  console.log(statusIcon);
-  console.log(doneSection);
+// ASIGN STATE
 
-  statusIcon.addEventListener("click", (event) => {
+const asingState = (taskArticle, taskName) => {
+  const stateIcon = document.getElementById(`${taskName}-icon`);
+
+  stateIcon.addEventListener("click", (event) => {
     event.preventDefault();
-    console.log(taskArticle);
-    if (statusIcon.classList.contains("pending")) {
-      statusIcon.classList.remove("pending");
-      statusIcon.classList.add("done");
+    let state = "todo";
+
+    if (stateIcon.classList.contains("todo")) {
+      state = "done";
+      stateIcon.classList.remove("todo");
+      stateIcon.classList.add("done");
       todoSection.removeChild(taskArticle);
       doneSection.appendChild(taskArticle);
     } else {
-      statusIcon.classList.remove("done");
-      statusIcon.classList.add("pending");
+      state = "todo";
+      stateIcon.classList.remove("done");
+      stateIcon.classList.add("todo");
       doneSection.removeChild(taskArticle);
       todoSection.appendChild(taskArticle);
     }
+
+    taskList.map((task) => {
+      if (task[0] == taskName) {
+        task[1] = state;
+      }
+    });
+    localStorage.setItem("taskList", JSON.stringify(taskList));
   });
 };
+
+// UPDATE TASK
+
+const loadTask = () => {
+  taskList.map((task) => {
+    printTask(task[0], task[1]);
+  });
+};
+
+if (taskList) {
+  loadTask();
+}
+
+// DELETE TASK
