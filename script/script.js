@@ -7,9 +7,6 @@ const doneSection = document.getElementById("done-section");
 const currentDate = document.getElementById("current-day");
 const newInput = document.getElementById("new-input");
 const newButton = document.getElementById("new-button");
-// const allButton = document.getElementById("all-filter");
-// const pendingButton = document.getElementById("pending-filter");
-// const completedButton = document.getElementById("completed-filter");
 const filterButtons = [...document.getElementsByClassName("filter-button")];
 console.log(filterButtons);
 
@@ -18,7 +15,7 @@ let taskList = JSON.parse(localStorage.getItem("taskList")) || [];
 console.log(taskList);
 
 // ==========================
-// UTILITY FUNCTIONS
+// COMMON FUNCTIONS
 // ==========================
 
 // Formate current date and print on header
@@ -40,11 +37,13 @@ const saveTasks = () => {
 };
 
 // Charge all task saved on localStorage
-const loadTask = (state = "all") => {
+const loadTasks = (state = "all") => {
   let filteredTaskList = filterTasks(state);
   filteredTaskList.forEach((task) => {
     printTask(task.name, task.state);
   });
+  printCounters();
+  console.log("after printCounters");
 };
 
 // Clear tasks from DOM
@@ -52,15 +51,50 @@ const clearTasks = () => {
   todoSection.innerHTML = `
         <div class="section-header">
           <h2>ToDo</h2>
+          <span class="counter" id="todo-counter"></span>
         </div>`;
   doneSection.innerHTML = `
         <div class="section-header">
           <h2>Done</h2>
+          <span class="counter" id="done-counter"></span>
         </div>`;
 };
 
+// ==============
+// FILTER TASKS
+// ==============
+
+// Filter taskList
+const filterTasks = (state = "all") => {
+  return state === "all"
+    ? taskList
+    : taskList.filter((task) => task.state == state);
+};
+
+// Activate filter button
+const activateFilterButton = (clickedButton) => {
+  filterButtons.forEach((button) => {
+    button == clickedButton
+      ? button.classList.add("filter-active")
+      : button.classList.remove("filter-active");
+  });
+};
+
 // ==========================
-// TASKS FUNCTIONS
+// PRINT COUNTERS
+// ==========================
+
+const printCounters = () => {
+  const todoCounter = document.getElementById("todo-counter");
+  const doneCounter = document.getElementById("done-counter");
+  const todoNumber = taskList.filter((task) => task.state == "todo").length;
+  todoCounter.textContent = todoNumber;
+  const doneNumber = taskList.filter((task) => task.state == "done").length;
+  doneCounter.textContent = doneNumber;
+};
+
+// ==========================
+// CREATE TASK
 // ==========================
 
 // Print task on apropiate section
@@ -71,7 +105,7 @@ const printTask = (taskName, state) => {
   taskArticle.innerHTML = `
 		<div class="task-header">
             <div class="status-icon ${state}" id="${taskName}-icon"></div>
-            <h3 class="task-name">${taskName}</h3>
+            <h3 class="task-name" id="${taskName}-task-name">${taskName}</h3>
 		</div>
 		<button class="delete-button" id="${taskName}-delete-button"></button>`;
   if (state == "todo") {
@@ -85,6 +119,7 @@ const printTask = (taskName, state) => {
   });
   activateDeleteButton(taskName, state);
   asingState(taskArticle, taskName);
+  // asignEditEvent(taskArticle, taskName, state);
 };
 
 // Create a new task and save it
@@ -133,7 +168,7 @@ const asingState = (taskArticle, taskName) => {
   });
 };
 
-// Print delete-button on completed tasks
+// Print delete-button
 const activateDeleteButton = (taskName, state) => {
   const deleteButton = document.getElementById(`${taskName}-delete-button`);
   if (deleteButton) {
@@ -146,40 +181,62 @@ const activateDeleteButton = (taskName, state) => {
   }
 };
 
+// ============
+// DELETE TASK
+// ============
+
 // Delete task from localStorage
 const deleteFromLocalStorage = (taskName) => {
   taskList = taskList.filter((task) => task.name != taskName);
   saveTasks();
 };
 
-// Delete task-article from done-section
+// Delete task-article from DOM
 const deleteFromDocument = (taskName, state) => {
   const taskArticle = document.getElementById(`${taskName}`);
-  if (state == "todo") {
-    todoSection.removeChild(taskArticle);
-  } else {
-    doneSection.removeChild(taskArticle);
-  }
-};
-
-// Filter taskList
-const filterTasks = (state = "all") => {
-  return state === "all"
-    ? taskList
-    : taskList.filter((task) => task.state == state);
-};
-
-// Activate filter button
-const activateFilterButton = (clickedButton) => {
-  filterButtons.forEach((button) => {
-    button == clickedButton
-      ? button.classList.add("filter-active")
-      : button.classList.remove("filter-active");
-  });
+  taskArticle.classList.remove("article-show");
+  taskArticle.classList.add("article-unshow");
+  taskArticle.addEventListener(
+    "animationend",
+    () => {
+      if (state == "todo") {
+        todoSection.removeChild(taskArticle);
+      } else {
+        doneSection.removeChild(taskArticle);
+      }
+    },
+    { once: true }
+  );
 };
 
 // ==========================
-// EVENTOS
+// UPDATE TASK
+// ==========================
+
+// const asignEditEvent = (taskArticle, taskname) => {
+//   taskArticle.addEventListener("click", (event) => {
+//     event.preventDefault();
+//     showInput(taskArticle, taskname);
+//   });
+// };
+
+// const showInput = (taskArticle, taskName, state) => {
+//   taskArticle.innerHTML = `
+// 		<div class="task-header">
+//             <div class="status-icon ${state}" id="${taskName}-icon"></div>
+//           <input
+//             type="text"
+//             name="${taskName}"
+//             id="${taskName}-input"
+//             placeholder="${taskName}"
+//             autocomplete="off"
+//           />
+// 		</div>
+// 		<button class="delete-button" id="${taskName}-delete-button"></button>`;
+// };
+
+// ==========================
+// ASIGN EVENTS
 // ==========================
 
 newInput.addEventListener("keydown", (event) => {
@@ -199,7 +256,7 @@ filterButtons.forEach((button) => {
   button.addEventListener("click", (event) => {
     event.preventDefault();
     clearTasks();
-    loadTask(button.dataset.filter);
+    loadTasks(button.dataset.filter);
     activateFilterButton(button);
   });
 });
@@ -209,4 +266,4 @@ filterButtons.forEach((button) => {
 // ==========================
 
 printCurrentDate();
-loadTask();
+loadTasks();
