@@ -1,4 +1,6 @@
-/* FONTS AND VARIABLES */
+/* =============== */
+/* FONTS & VARIABLES */
+/* =============== */
 
 @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
 
@@ -11,7 +13,9 @@
   --color-bg: #dff2ff;
 }
 
-/* RESET AND GLOBAL */
+/* =============== */
+/* RESET & GLOBAL */
+/* =============== */
 
 * {
   margin: 0;
@@ -31,7 +35,6 @@ section {
   margin: 1rem auto;
   width: 95%;
   max-width: 600px;
-  /* min-height: 5rem; */
 }
 
 article {
@@ -40,11 +43,14 @@ article {
   align-items: center;
   width: 100%;
   height: 4rem;
-  padding: 0rem 1.5rem;
+  padding: 0 1.5rem;
+  border: 1px solid var(--color-accent);
   border-radius: 0.5rem;
 }
 
+/* =============== */
 /* HEADER */
+/* =============== */
 
 header {
   padding: 1rem;
@@ -71,7 +77,14 @@ h2 {
   color: var(--color-secondary);
 }
 
-/* NEW SECTION */
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* =============== */
+/* NEW TASK SECTION */
+/* =============== */
 
 #new-article {
   background-color: var(--color-accent);
@@ -79,17 +92,18 @@ h2 {
 }
 
 #new-input {
-  font-size: 1.5rem;
+  width: 100%;
   height: 2rem;
   border: none;
   background-color: inherit;
+  font-size: 1.5rem;
   color: var(--color-light);
 }
 
 #new-input:focus {
-  border: none;
   outline: none;
   box-shadow: none;
+  border: none;
 }
 
 #new-input::placeholder {
@@ -112,19 +126,55 @@ h2 {
   cursor: pointer;
 }
 
-/* TODO SECTION */
+/* Animation */
 
-.todo-article {
-  /* background-color: var(--color-bg); */
-  border: 1px solid var(--color-accent);
+@keyframes slideFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    transform: scale((1));
+  }
 }
 
-h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
+.article-show {
+  animation: slideFadeIn 0.5s ease forwards;
 }
 
+/* =============== */
+/* FILTER SECTION */
+/* =============== */
+
+#filter-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  color: var(--color-secondary);
+}
+
+.filter-button {
+  height: 2rem;
+  border: none;
+  background: none;
+  color: var(--color-secondary);
+}
+
+.filter-active {
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.filter-button:hover {
+  cursor: pointer;
+}
+
+/* =============== */
 /* STATUS ICON */
+/* =============== */
 
 .task-header {
   display: flex;
@@ -144,33 +194,31 @@ h3 {
   cursor: pointer;
 }
 
-/* .todo {
-  background-image: url("../assets/icons/circle_accent.svg");
-  background-size: cover;
-} */
-
 .done {
   background-image: url("../assets/icons/check_accent.svg");
   background-color: var(--color-accent);
 }
 
-/* DONE */
+/* =============== */
+/* DELETE BUTTON */
+/* =============== */
 
 .delete-button {
   display: none;
+  width: 35px;
+  height: 35px;
   padding: 0.3rem;
-  border: 1px solid var(--color-oposite);
+  border: none;
   border-radius: 0.2rem;
   background-color: inherit;
-  font-family: inherit;
-  font-size: 1.2rem;
-  color: var(--color-oposite);
-}
-
-.active {
-	display: block;
+  background-image: url("../assets/icons/delete_primary.svg");
+  background-size: contain;
 }
 
 .delete-button:hover {
   cursor: pointer;
+}
+
+.active {
+  display: block;
 }

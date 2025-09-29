@@ -26,10 +26,27 @@
           <button id="new-button">Add</button>
         </article>
       </section>
+      <section id="filter-section">
+        <button
+          class="filter-button filter-active"
+          id="all-filter"
+          data-filter="all"
+        >
+          All
+        </button>
+        <span>|</span>
+        <button class="filter-button" id="todo-filter" data-filter="todo">
+          ToDo
+        </button>
+        <span>|</span>
+        <button class="filter-button" id="done-filter" data-filter="done">
+          Done
+        </button>
+      </section>
       <section id="todo-section">
-        <!-- <div class="section-header">
+        <div class="section-header">
           <h2>ToDo</h2>
-		</div> -->
+        </div>
       </section>
       <section id="done-section">
         <div class="section-header">
