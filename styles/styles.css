@@ -208,6 +208,19 @@ h3 {
   cursor: pointer;
 }
 
+.edit-input {
+  border: none;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.edit-input:focus {
+  outline: none;
+  border: none;
+}
+
 /* =============== */
 /* DELETE BUTTON */
 /* =============== */
@@ -275,7 +288,8 @@ h3 {
     grid-template-columns: 1fr 1fr;
   }
 
-  #new-section, #filter-section {
+  #new-section,
+  #filter-section {
     grid-column: 1/3;
   }
 

@@ -103,7 +103,7 @@ const printTask = (taskName, state) => {
   taskArticle.className = "todo-article";
   taskArticle.id = taskName;
   taskArticle.innerHTML = `
-		<div class="task-header">
+		<div class="task-header" id="${taskName}-task-header">
             <div class="status-icon ${state}" id="${taskName}-icon"></div>
             <h3 class="task-name" id="${taskName}-task-name">${taskName}</h3>
 		</div>
@@ -119,7 +119,7 @@ const printTask = (taskName, state) => {
   });
   activateDeleteButton(taskName, state);
   asingState(taskArticle, taskName);
-  // asignEditEvent(taskArticle, taskName, state);
+  asignEditEvent(taskName);
 };
 
 // Create a new task and save it
@@ -217,26 +217,80 @@ const deleteFromDocument = (taskName, state) => {
 // UPDATE TASK
 // ==========================
 
-// const asignEditEvent = (taskArticle, taskname) => {
-//   taskArticle.addEventListener("click", (event) => {
-//     event.preventDefault();
-//     showInput(taskArticle, taskname);
-//   });
-// };
+// Asign event to H3
+const asignEditEvent = (taskName) => {
+  const taskNameH3 = document.getElementById(`${taskName}-task-name`);
+  taskNameH3.addEventListener("click", (event) => {
+    event.preventDefault;
+    createEditInput(taskNameH3, taskName);
+  });
+};
 
-// const showInput = (taskArticle, taskName, state) => {
-//   taskArticle.innerHTML = `
-// 		<div class="task-header">
-//             <div class="status-icon ${state}" id="${taskName}-icon"></div>
-//           <input
-//             type="text"
-//             name="${taskName}"
-//             id="${taskName}-input"
-//             placeholder="${taskName}"
-//             autocomplete="off"
-//           />
-// 		</div>
-// 		<button class="delete-button" id="${taskName}-delete-button"></button>`;
+// Create edit input and asign events
+const createEditInput = (taskNameH3, taskName) => {
+  // get taskheader
+  const taskHeader = document.getElementById(`${taskName}-task-header`);
+  // crate input
+  const editInput = document.createElement("input");
+  editInput.classList.add("edit-input");
+
+  // toggle h3 and input
+  taskHeader.removeChild(taskNameH3);
+  taskHeader.appendChild(editInput);
+
+  // put focus on input
+  editInput.value = taskNameH3.textContent;
+  editInput.focus();
+
+  asignKeydownEvent(taskHeader, taskNameH3, editInput);
+  // asignBlurEvent(taskHeader, taskNameH3, editInput);
+};
+
+// Asign keydown event to edit input
+const asignKeydownEvent = (taskHeader, taskNameH3, editInput) => {
+  // add event to edit input
+  editInput.addEventListener("keydown", (event) => {
+    if (event.key == "Enter") {
+      console.log("Enter");
+      if (editInput.value.trim()) {
+        // change taskList and save
+        taskList = taskList.map((task) =>
+          task.name === taskNameH3.textContent
+            ? { ...task, name: editInput.value }
+            : task
+        );
+        saveTasks();
+        // print h3
+        taskNameH3.textContent = editInput.value;
+        taskHeader.removeChild(editInput);
+        taskHeader.appendChild(taskNameH3);
+      }
+    } else if (event.key === "Escape") {
+      taskHeader.removeChild(editInput);
+      taskHeader.appendChild(taskNameH3);
+    }
+  });
+};
+
+// Asign blur evet to edit input
+// const asignBlurEvent = (taskHeader, taskNameH3, editInput) => {
+//   // add event to edit input
+//   editInput.addEventListener("blur", (event) => {
+//     console.log("Enter");
+//     if (editInput.value.trim()) {
+//       // change taskList and save
+//       taskList = taskList.map((task) =>
+//         task.name === taskNameH3.textContent
+//           ? { ...task, name: editInput.value }
+//           : task
+//       );
+//       saveTasks();
+//       // print h3
+//       taskNameH3.textContent = editInput.value;
+//       taskHeader.removeChild(editInput);
+//       taskHeader.appendChild(taskNameH3);
+//     }
+//   });
 // };
 
 // ==========================
