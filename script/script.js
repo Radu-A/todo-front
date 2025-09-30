@@ -127,12 +127,14 @@ const createTask = (taskName, state) => {
   taskList.push({ name: taskName, state: state });
   saveTasks();
   printTask(taskName, state);
+  printCounters();
 };
 
 //  Asign event and state to a task
 const asingState = (taskArticle, taskName) => {
+  // get state-icon div
   const stateIcon = document.getElementById(`${taskName}-icon`);
-
+  // add event to state-icon div
   stateIcon.addEventListener("click", (event) => {
     event.preventDefault();
     let state = "todo";
@@ -165,6 +167,7 @@ const asingState = (taskArticle, taskName) => {
       }
     });
     localStorage.setItem("taskList", JSON.stringify(taskList));
+    printCounters();
   });
 };
 
@@ -207,6 +210,7 @@ const deleteFromDocument = (taskName, state) => {
     },
     { once: true }
   );
+  printCounters();
 };
 
 // ==========================
@@ -241,15 +245,19 @@ const deleteFromDocument = (taskName, state) => {
 
 newInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
-    createTask(newInput.value, "todo");
-    newInput.value = "";
+    if (newInput.value) {
+      createTask(newInput.value, "todo");
+      newInput.value = "";
+    }
   }
 });
 
 newButton.addEventListener("click", (event) => {
   event.preventDefault();
-  createTask(newInput.value, "todo");
-  newInput.value = "";
+  if (newInput.value) {
+    createTask(newInput.value, "todo");
+    newInput.value = "";
+  }
 });
 
 filterButtons.forEach((button) => {
