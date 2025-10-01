@@ -267,12 +267,12 @@ const asignBlurEvent = (taskHeader, taskNameH3, editInput, oldTaskName) => {
   });
 };
 
-// Actualiza el nombre del task en DOM, ids y localStorage
+// Update task name on DOM, ids and localstore
 const updateTaskName = (taskHeader, taskNameH3, editInput, oldTaskName) => {
   const newTaskName = editInput.value.trim();
   taskNameH3.textContent = newTaskName;
 
-  // === actualizar DOM ids ===
+  // === update DOM ids ===
   const taskArticle = document.getElementById(oldTaskName);
   taskArticle.id = newTaskName;
 
@@ -287,16 +287,16 @@ const updateTaskName = (taskHeader, taskNameH3, editInput, oldTaskName) => {
 
   taskNameH3.id = `${newTaskName}-task-name`;
 
-  // === actualizar taskList ===
+  // === update taskList ===
   taskList = taskList.map((task) =>
     task.name === oldTaskName ? { ...task, name: newTaskName } : task
   );
   saveTasks();
 
-  // === reemplazar input con h3 ===
+  // === replace input con h3 ===
   taskHeader.replaceChild(taskNameH3, editInput);
 
-  // volver a asignar listeners a los nuevos IDs
+  // reasign listeners to new IDs
   asignEditEvent(newTaskName);
   activateDeleteButton(newTaskName);
 };

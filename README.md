@@ -6,7 +6,7 @@ Data is stored in **LocalStorage**, so your tasks persist even after refreshing 
 
 ---
 
-## 📸 Screenshot
+## Screenshot
 
 _Add a screenshot of the project here:_
 
@@ -14,7 +14,7 @@ _Add a screenshot of the project here:_
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 
 1. [Features](#-features)
 2. [Technologies](#-technologies)
@@ -24,7 +24,7 @@ _Add a screenshot of the project here:_
 
 ---
 
-## ✨ Features
+## Features
 
 - ✅ Add new tasks.
 - ✏️ Edit existing task names.
@@ -36,7 +36,7 @@ _Add a screenshot of the project here:_
 
 ---
 
-## 🛠 Technologies
+## Technologies
 
 - **HTML5** for structure.
 - **CSS3** with variables and animations.
@@ -45,7 +45,7 @@ _Add a screenshot of the project here:_
 
 ---
 
-## 🚀 Installation & Usage
+## Installation & Usage
 
 1. Clone this repository:
 
@@ -58,7 +58,7 @@ _Add a screenshot of the project here:_
 
 3. Start organizing your day ✨
 
-## 📚 What I Learned
+## What I Learned
 
 This project helped me practice and deepen my knowledge of:
 
@@ -72,7 +72,7 @@ This project helped me practice and deepen my knowledge of:
 
 - CSS animations integrated with JavaScript logic.
 
-## 🔮 Future Improvements
+## Future Improvements
 
 - Add drag & drop to reorder tasks.
 
