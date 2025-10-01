@@ -221,77 +221,85 @@ const deleteFromDocument = (taskName, state) => {
 const asignEditEvent = (taskName) => {
   const taskNameH3 = document.getElementById(`${taskName}-task-name`);
   taskNameH3.addEventListener("click", (event) => {
-    event.preventDefault;
+    event.preventDefault();
     createEditInput(taskNameH3, taskName);
   });
 };
 
 // Create edit input and asign events
 const createEditInput = (taskNameH3, taskName) => {
-  // get taskheader
   const taskHeader = document.getElementById(`${taskName}-task-header`);
-  // crate input
+
   const editInput = document.createElement("input");
   editInput.classList.add("edit-input");
 
   // toggle h3 and input
-  taskHeader.removeChild(taskNameH3);
-  taskHeader.appendChild(editInput);
+  taskHeader.replaceChild(editInput, taskNameH3);
 
-  // put focus on input
   editInput.value = taskNameH3.textContent;
   editInput.focus();
 
-  asignKeydownEvent(taskHeader, taskNameH3, editInput);
-  // asignBlurEvent(taskHeader, taskNameH3, editInput);
+  asignKeydownEvent(taskHeader, taskNameH3, editInput, taskName);
+  asignBlurEvent(taskHeader, taskNameH3, editInput, taskName);
 };
 
 // Asign keydown event to edit input
-const asignKeydownEvent = (taskHeader, taskNameH3, editInput) => {
-  // add event to edit input
+const asignKeydownEvent = (taskHeader, taskNameH3, editInput, oldTaskName) => {
   editInput.addEventListener("keydown", (event) => {
     if (event.key == "Enter") {
-      console.log("Enter");
       if (editInput.value.trim()) {
-        // change taskList and save
-        taskList = taskList.map((task) =>
-          task.name === taskNameH3.textContent
-            ? { ...task, name: editInput.value }
-            : task
-        );
-        saveTasks();
-        // print h3
-        taskNameH3.textContent = editInput.value;
-        taskHeader.removeChild(editInput);
-        taskHeader.appendChild(taskNameH3);
+        updateTaskName(taskHeader, taskNameH3, editInput, oldTaskName);
       }
     } else if (event.key === "Escape") {
-      taskHeader.removeChild(editInput);
-      taskHeader.appendChild(taskNameH3);
+      taskHeader.replaceChild(taskNameH3, editInput);
     }
   });
 };
 
-// Asign blur evet to edit input
-// const asignBlurEvent = (taskHeader, taskNameH3, editInput) => {
-//   // add event to edit input
-//   editInput.addEventListener("blur", (event) => {
-//     console.log("Enter");
-//     if (editInput.value.trim()) {
-//       // change taskList and save
-//       taskList = taskList.map((task) =>
-//         task.name === taskNameH3.textContent
-//           ? { ...task, name: editInput.value }
-//           : task
-//       );
-//       saveTasks();
-//       // print h3
-//       taskNameH3.textContent = editInput.value;
-//       taskHeader.removeChild(editInput);
-//       taskHeader.appendChild(taskNameH3);
-//     }
-//   });
-// };
+// Asign blur event to edit input
+const asignBlurEvent = (taskHeader, taskNameH3, editInput, oldTaskName) => {
+  editInput.addEventListener("blur", () => {
+    if (editInput.value.trim()) {
+      updateTaskName(taskHeader, taskNameH3, editInput, oldTaskName);
+    } else {
+      taskHeader.replaceChild(taskNameH3, editInput);
+    }
+  });
+};
+
+// Actualiza el nombre del task en DOM, ids y localStorage
+const updateTaskName = (taskHeader, taskNameH3, editInput, oldTaskName) => {
+  const newTaskName = editInput.value.trim();
+  taskNameH3.textContent = newTaskName;
+
+  // === actualizar DOM ids ===
+  const taskArticle = document.getElementById(oldTaskName);
+  taskArticle.id = newTaskName;
+
+  const stateIcon = document.getElementById(`${oldTaskName}-icon`);
+  if (stateIcon) stateIcon.id = `${newTaskName}-icon`;
+
+  const header = document.getElementById(`${oldTaskName}-task-header`);
+  if (header) header.id = `${newTaskName}-task-header`;
+
+  const deleteButton = document.getElementById(`${oldTaskName}-delete-button`);
+  if (deleteButton) deleteButton.id = `${newTaskName}-delete-button`;
+
+  taskNameH3.id = `${newTaskName}-task-name`;
+
+  // === actualizar taskList ===
+  taskList = taskList.map((task) =>
+    task.name === oldTaskName ? { ...task, name: newTaskName } : task
+  );
+  saveTasks();
+
+  // === reemplazar input con h3 ===
+  taskHeader.replaceChild(taskNameH3, editInput);
+
+  // volver a asignar listeners a los nuevos IDs
+  asignEditEvent(newTaskName);
+  activateDeleteButton(newTaskName);
+};
 
 // ==========================
 // ASIGN EVENTS
