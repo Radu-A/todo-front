@@ -8,11 +8,10 @@ const currentDate = document.getElementById("current-day");
 const newInput = document.getElementById("new-input");
 const newButton = document.getElementById("new-button");
 const filterButtons = [...document.getElementsByClassName("filter-button")];
-console.log(filterButtons);
 
 // State on memory
 let taskList = JSON.parse(localStorage.getItem("taskList")) || [];
-console.log(taskList);
+console.log("Initial taskList loaded:", taskList);
 
 // ==========================
 // COMMON FUNCTIONS
@@ -20,14 +19,15 @@ console.log(taskList);
 
 // Formate current date and print on header
 const printCurrentDate = () => {
-  // get date to a variable
+  // Get today's date
   const today = new Date();
+  // Format the date to a localized string (e.g., "Wednesday, October 22")
   const formatedDate = today.toLocaleDateString("en-EN", {
     weekday: "long",
     month: "long",
     day: "numeric",
   });
-  // insert date into DOM
+  // Insert formatted date into the DOM header
   currentDate.textContent = formatedDate;
 };
 
@@ -38,12 +38,15 @@ const saveTasks = () => {
 
 // Charge all task saved on localStorage
 const loadTasks = (state = "all") => {
+  // Get the task list filtered by the current state (all, todo, or done)
   let filteredTaskList = filterTasks(state);
+  // Render each task in the filtered list to the DOM
   filteredTaskList.forEach((task) => {
     printTask(task.name, task.state);
   });
+  // Update the displayed count for todo/done sections
   printCounters();
-  console.log("after printCounters");
+  // console.log("Tasks loaded and counters updated."); // Example console message
 };
 
 // Clear tasks from DOM
@@ -113,7 +116,7 @@ const printTask = (taskName, state) => {
   } else {
     doneSection.appendChild(taskArticle);
   }
-  // Force reflow
+  // Force reflow/repaint to ensure the CSS transition runs for the new element
   requestAnimationFrame(() => {
     taskArticle.classList.add("article-show");
   });
@@ -141,11 +144,15 @@ const asingState = (taskArticle, taskName) => {
 
     if (stateIcon.classList.contains("todo")) {
       state = "done";
+      // Prepare for transition out
       taskArticle.classList.remove("article-show");
+      // Update visual state (icon)
       stateIcon.classList.remove("todo");
       stateIcon.classList.add("done");
+      // Move task from ToDo to Done section in the DOM
       todoSection.removeChild(taskArticle);
       doneSection.appendChild(taskArticle);
+      // Re-enable transition in the new section
       requestAnimationFrame(() => {
         taskArticle.classList.add("article-show");
       });
@@ -194,11 +201,13 @@ const deleteFromLocalStorage = (taskName) => {
   saveTasks();
 };
 
-// Delete task-article from DOM
+// Delete task-article from DOM after a fade-out animation
 const deleteFromDocument = (taskName, state) => {
   const taskArticle = document.getElementById(`${taskName}`);
+  // Start fade-out animation
   taskArticle.classList.remove("article-show");
   taskArticle.classList.add("article-unshow");
+  // Remove the element from the DOM once the CSS animation finishes
   taskArticle.addEventListener(
     "animationend",
     () => {
@@ -208,7 +217,7 @@ const deleteFromDocument = (taskName, state) => {
         doneSection.removeChild(taskArticle);
       }
     },
-    { once: true }
+    { once: true } // Ensure the listener is removed after first execution
   );
   printCounters();
 };
@@ -302,7 +311,7 @@ const updateTaskName = (taskHeader, taskNameH3, editInput, oldTaskName) => {
 };
 
 // ==========================
-// ASIGN EVENTS
+// ASIGN EVENT LISTENERS
 // ==========================
 
 newInput.addEventListener("keydown", (event) => {
@@ -332,7 +341,7 @@ filterButtons.forEach((button) => {
 });
 
 // ==========================
-// INICIALIZATION
+// INITIALIZATION
 // ==========================
 
 printCurrentDate();
