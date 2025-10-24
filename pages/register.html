@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ToDo List</title>
-    <link rel="stylesheet" href="../styles/styles.css" />
+    <title>Login - ToDo List</title>
+    <link rel="stylesheet" href="../styles/login.css" />
     <link
       rel="shortcut icon"
       href="../assets/icons/favicon.png"
@@ -12,6 +12,39 @@
     />
   </head>
   <body>
+    <main class="login-main">
+      <section id="login-section">
+        <h1>Create a new account</h1>
+        <article id="login-article">
+          <input
+            type="name"
+            class="auth-input"
+            id="name-input"
+            placeholder="Nombre"
+            required
+          />
+          <input
+            type="email"
+            class="auth-input"
+            id="email-input"
+            placeholder="Email"
+            required
+          />
+          <input
+            type="password"
+            class="auth-input"
+            id="password-input"
+            placeholder="Password"
+            required
+          />
+          <button class="auth-button" id="login-button">Send</button>
+        </article>
+        <div class="link-text">
+          Do you already have an account?
+          <a href="register.html">Log in</a>
+        </div>
+      </section>
+    </main>
     <script src="../script/script.js"></script>
   </body>
 </html>

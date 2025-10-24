@@ -10,6 +10,12 @@
    se encarga de centrar la sección de login vertical y horizontalmente.
 */
 
+.login-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 #login-section {
   /* Hace que la caja de login sea distinta, sobrescribiendo el estilo genérico de 'section' */
   padding: 2rem;
@@ -19,7 +25,6 @@
   background-color: var(--color-light);
   text-align: center; /* Centra el h1 y el texto del enlace */
   max-width: 350px; /* Tamaño ligeramente más pequeño para formularios de autenticación */
-  max-height: 350px;
 }
 
 #login-article {
