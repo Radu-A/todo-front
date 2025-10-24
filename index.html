@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ToDo List</title>
-    <link rel="stylesheet" href="./styles/styles.css" />
+    <link rel="stylesheet" href="./styles/index.css" />
     <link
       rel="shortcut icon"
       href="./assets/icons/favicon.png"
@@ -19,47 +19,49 @@
       </div>
     </header>
     <main>
-      <section id="new-section">
-        <article id="new-article">
-          <input
-            type="text"
-            name="new-input"
-            id="new-input"
-            placeholder="New Task"
-            autocomplete="off"
-          />
-          <button id="new-button">Add</button>
-        </article>
-      </section>
-      <section id="filter-section">
-        <button
-          class="filter-button filter-active"
-          id="all-filter"
-          data-filter="all"
-        >
-          All
-        </button>
-        <span>|</span>
-        <button class="filter-button" id="todo-filter" data-filter="todo">
-          ToDo
-        </button>
-        <span>|</span>
-        <button class="filter-button" id="done-filter" data-filter="done">
-          Done
-        </button>
-      </section>
-      <section id="todo-section">
-        <div class="section-header">
-          <h2>ToDo</h2>
-          <span class="counter" id="todo-counter"></span>
-        </div>
-      </section>
-      <section id="done-section">
-        <div class="section-header">
-          <h2>Done</h2>
-          <span class="counter" id="done-counter"></span>
-        </div>
-      </section>
+      <div class="container">
+        <section id="new-section">
+          <article id="new-article">
+            <input
+              type="text"
+              name="new-input"
+              id="new-input"
+              placeholder="New Task"
+              autocomplete="off"
+            />
+            <button id="new-button">Add</button>
+          </article>
+        </section>
+        <section id="filter-section">
+          <button
+            class="filter-button filter-active"
+            id="all-filter"
+            data-filter="all"
+          >
+            All
+          </button>
+          <span>|</span>
+          <button class="filter-button" id="todo-filter" data-filter="todo">
+            ToDo
+          </button>
+          <span>|</span>
+          <button class="filter-button" id="done-filter" data-filter="done">
+            Done
+          </button>
+        </section>
+        <section id="todo-section">
+          <div class="section-header">
+            <h2>ToDo</h2>
+            <span class="counter" id="todo-counter"></span>
+          </div>
+        </section>
+        <section id="done-section">
+          <div class="section-header">
+            <h2>Done</h2>
+            <span class="counter" id="done-counter"></span>
+          </div>
+        </section>
+      </div>
     </main>
     <script src="./script/script.js"></script>
   </body>
