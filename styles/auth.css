@@ -10,13 +10,13 @@
    se encarga de centrar la sección de login vertical y horizontalmente.
 */
 
-.login-main {
+.auth-main {
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
-#login-section {
+.auth-section {
   /* Hace que la caja de login sea distinta, sobrescribiendo el estilo genérico de 'section' */
   padding: 2rem;
   border: 1px solid var(--color-secondary);
@@ -27,7 +27,7 @@
   max-width: 350px; /* Tamaño ligeramente más pequeño para formularios de autenticación */
 }
 
-#login-article {
+.auth-article {
   /* Sobrescribe el estilo base de 'article' para un contenedor de formulario flexible */
   flex-direction: column;
   justify-content: center;

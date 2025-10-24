@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - ToDo List</title>
-    <link rel="stylesheet" href="../styles/login.css" />
+    <link rel="stylesheet" href="../styles/auth.css" />
     <link
       rel="shortcut icon"
       href="../assets/icons/favicon.png"
@@ -12,21 +12,21 @@
     />
   </head>
   <body>
-    <main class="login-main">
-      <section id="login-section">
+    <main class="auth-main">
+      <section class="auth-section" id="login-section">
         <h1>Welcome Back</h1>
-        <article id="login-article">
+        <article class="auth-article" id="login-article">
           <input
             type="email"
             class="auth-input"
-            id="email-input"
+            id="email-login-input"
             placeholder="Email"
             required
           />
           <input
             type="password"
             class="auth-input"
-            id="password-input"
+            id="password-login-input"
             placeholder="Password"
             required
           />
@@ -38,6 +38,6 @@
         </div>
       </section>
     </main>
-    <script src="../script/script.js"></script>
+    <script src="../script/auth.js"></script>
   </body>
 </html>
