@@ -28,17 +28,21 @@
 }
 
 .auth-article {
-  /* Sobrescribe el estilo base de 'article' para un contenedor de formulario flexible */
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   padding: 0;
   border: none;
-  gap: 1rem;
   height: auto;
 }
 
 /* Elementos del Formulario */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
 
 .auth-input {
   width: 100%;

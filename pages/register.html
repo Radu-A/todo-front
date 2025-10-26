@@ -12,32 +12,40 @@
     />
   </head>
   <body>
+    <header>
+      <div id="header-container">
+        <h1>ToDo List</h1>
+        <time id="current-day"></time>
+      </div>
+    </header>
     <main class="auth-main">
       <section class="auth-section">
         <h1>Create a new account</h1>
         <article class="auth-article">
-          <input
-            type="name"
-            class="auth-input"
-            id="name-auth-input"
-            placeholder="Nombre de usuario"
-            required
-          />
-          <input
-            type="email"
-            class="auth-input"
-            id="email-auth-input"
-            placeholder="Email"
-            required
-          />
-          <input
-            type="password"
-            class="auth-input"
-            id="password-auth-input"
-            placeholder="Password"
-            required
-          />
-          <button class="auth-button" id="login-button">Send</button>
+          <form class="auth-form" id="register-form" action="">
+            <input
+              type="name"
+              class="auth-input"
+              id="name-auth-input"
+              placeholder="Nombre de usuario"
+              required
+            />
+            <input
+              type="email"
+              class="auth-input"
+              id="email-auth-input"
+              placeholder="Email"
+              required
+            />
+            <input
+              type="password"
+              class="auth-input"
+              id="password-auth-input"
+              placeholder="Password"
+              required
+            />
+            <button class="auth-button" id="auth-button">Send</button>
+          </form>
         </article>
         <div class="link-text">
           Do you already have an account?
@@ -45,6 +53,10 @@
         </div>
       </section>
     </main>
+    <footer class="app-footer">
+      <p>&copy; <span id="current-year"></span>ToDo List | Víctor Outeiro</p>
+      <p>Todos los derechos reservados.</p>
+    </footer>
     <script src="../script/auth.js"></script>
   </body>
 </html>

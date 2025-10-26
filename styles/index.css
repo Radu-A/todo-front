@@ -1,24 +1,6 @@
 /* Importar reglas base */
 @import url("./base.css");
 
-/* =============== */
-/* HEADER */
-/* =============== */
-
-header {
-  padding: 1rem;
-  border-bottom: 1px solid var(--color-accent);
-  color: var(--color-accent);
-}
-
-#header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  width: 95%;
-  max-width: 600px;
-  margin: 0 auto;
-}
 
 /* =============== */
 /* NEW TASK SECTION */
