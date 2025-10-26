@@ -90,3 +90,9 @@
 .link-text a:hover {
   text-decoration: underline;
 }
+
+/* VALIDATION */
+.validation-message {
+  color: rgb(255, 33, 33);
+  font-weight: 500;
+}
