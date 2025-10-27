@@ -4,6 +4,7 @@
 const server = "http://localhost:5000/api/auth";
 const emailAuthInput = document.getElementById("email-auth-input");
 const passwordAuthInput = document.getElementById("password-auth-input");
+const repeatAuthInput = document.getElementById("repeat-auth-input");
 const nameAuthInput = document.getElementById("name-auth-input");
 // Referencia al botón de envío
 const authButton = document.getElementById("auth-button");
@@ -28,7 +29,7 @@ const nameValidation = () => {
   nameMessage.className = "validation-message";
   nameMessage.id = "name-validation-message";
   nameMessage.textContent =
-    "El nombre debe poseer entre 3 y 20 caracteres y solo puede contener letras y espacios.";
+    "El nombre debe poseer entre 3 y 20 caracteres y solo puede contener letras.";
   const name = nameAuthInput.value.trim();
   console.log(name);
   if (!name || !checkName(name)) {
@@ -88,6 +89,29 @@ const passwordValidation = () => {
   const password = passwordAuthInput.value;
   if (!password || !checkPassword(password)) {
     passwordAuthInput.after(passwordMessage);
+    return false;
+  }
+  return true;
+};
+
+// ==================
+// REPEAT PASSWORD VALIDATION
+// ==================
+const repeatPasswordValidation = () => {
+  const usedPasswordMessage = document.getElementById(
+    "repeat-validation-message"
+  );
+  if (usedPasswordMessage) {
+    usedPasswordMessage.remove();
+  }
+  const repeatPasswordMessage = document.createElement("p");
+  repeatPasswordMessage.className = "validation-message";
+  repeatPasswordMessage.id = "repeat-validation-message";
+  repeatPasswordMessage.textContent = "La contraseñas no coinciden";
+  const password = passwordAuthInput.value;
+  const repeatPassword = repeatAuthInput.value;
+  if (password != repeatPassword) {
+    repeatAuthInput.after(repeatPasswordMessage);
     return false;
   }
   return true;
@@ -188,6 +212,12 @@ emailAuthInput.addEventListener("blur", () => {
 passwordAuthInput.addEventListener("blur", () => {
   passwordValidation();
 });
+
+if (repeatAuthInput) {
+  repeatAuthInput.addEventListener("blur", () => {
+    repeatPasswordValidation();
+  });
+}
 
 // Listener para el envío del formulario
 loginForm.addEventListener("submit", (event) => {
