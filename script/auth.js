@@ -118,31 +118,55 @@ const formValidation = () => {
 // ==================
 // LOGIN
 // ==================
-const getLoged = async (event) => {
+const handleLogin = async (event) => {
+  // Prepare data
   const data = {
     email: emailAuthInput.value,
     password: passwordAuthInput.value,
   };
+
+  console.log("Sending login request to server...");
+
   try {
     const res = await fetch(server, {
       method: "POST",
-      // 1. Indicar que enviamos JSON
-      headers: {
-        "Content-Type": "application/json",
-      },
-      // 2. Convertir el objeto simple a una cadena JSON
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
+    // 2. Manejo de Fallo de Autenticación (401/500)
     if (!res.ok) {
       const errorData = await res.json();
-      throw new Error(errorData.message || `Error HTTP: ${res.status}`);
+      // Lanza el mensaje del servidor para que el catch lo maneje
+      throw new Error(errorData.message || `HTTP Error: ${res.status}`);
     }
+
+    // 3. ÉXITO (Status 200)
     const result = await res.json();
-    console.log("Autenticación exitosa");
+    console.log("Authentication successful. User data:", result.user);
+
+    // 4. REDIRECCIÓN AL ÉXITO (Punto 1)
+    const baseUrl = `${window.location.origin}/todo-front`;
+    console.log(baseUrl);
+    console.log(`${baseUrl}/index.html`);
+    window.location.href = `${baseUrl}/index.html`;
   } catch (err) {
-    console.error("Fallo en el login o la red: ", err);
+    // 5. MANEJO DEL ERROR y Muestra de Mensaje
+    console.error("Login failed or network error:", err.message);
+
+    // Muestra el mensaje de error capturado (ej: "Credenciales inválidas")
+    showLoginError(err.message);
   }
+};
+
+const showLoginError = (message) => {
+  const existingMessage = document.getElementById("login-message");
+  if (existingMessage) existingMessage.remove();
+  const loginMessage = document.createElement("p");
+  loginMessage.textContent = message;
+  loginMessage.className = "validation-message";
+  loginMessage.id = "login-message";
+  loginForm.appendChild(loginMessage);
 };
 
 // ==================
@@ -169,7 +193,7 @@ loginForm.addEventListener("submit", (event) => {
 
   if (formValidation()) {
     console.log("¡Validación exitosa! Enviando datos al servidor...");
-    getLoged(event);
+    handleLogin(event);
   } else {
     console.log("Error de validación. Por favor, revisa los campos.");
   }
