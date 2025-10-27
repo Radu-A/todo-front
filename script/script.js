@@ -12,9 +12,9 @@ const filterButtons = [...document.getElementsByClassName("filter-button")];
 
 // --- STATE AND API ---
 // Almacena las tareas cargadas de la API.
-let taskList = []; 
+let taskList = [];
 // URL del backend (puertos separados requieren la URL absoluta).
-const API_URL = "http://localhost:5000/api/tasks"; 
+const API_URL = "http://localhost:5000/api/tasks";
 
 // ==========================
 // 2. COMMON UTILITIES
@@ -50,8 +50,12 @@ const filterTasks = (filterStatus = "all") => {
 const printCounters = () => {
   const todoCounter = document.getElementById("todo-counter");
   const doneCounter = document.getElementById("done-counter");
-  todoCounter.textContent = taskList.filter((task) => task.status == "todo").length;
-  doneCounter.textContent = taskList.filter((task) => task.status == "done").length;
+  todoCounter.textContent = taskList.filter(
+    (task) => task.status == "todo"
+  ).length;
+  doneCounter.textContent = taskList.filter(
+    (task) => task.status == "done"
+  ).length;
 };
 
 /** Resalta el botón de filtro activo. */
@@ -102,20 +106,35 @@ const printTask = (_id, taskName, status) => {
 // ==========================
 
 /** Carga todas las tareas desde la API (GET). */
-const loadTasks = async (filterStatus = "all") => {
-  clearTasks();
+const getTasks = async (filterStatus = "all") => {
+  const token = localStorage.getItem("userToken");
 
+  if (!token) {
+    console.error("No hay token de sesión. Redirigiendo a login");
+    const baseUrl = `${window.location.origin}/todo-front`;
+    window.location.href = `${baseUrl}/pages/login.html`;
+  }
+
+  clearTasks();
   try {
-    const response = await fetch(API_URL);
+    const response = await fetch(API_URL, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
     if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    
+
     taskList = await response.json();
     let filteredTaskList = filterTasks(filterStatus);
 
-    filteredTaskList.forEach((task) => printTask(task._id, task.title, task.status));
+    filteredTaskList.forEach((task) =>
+      printTask(task._id, task.title, task.status)
+    );
     printCounters();
   } catch (error) {
-    console.error("Fallo en loadTasks:", error);
+    console.error("Fallo en getTasks:", error);
   }
 };
 
@@ -173,7 +192,10 @@ const updateTaskInApi = async (_id, updateData) => {
       body: JSON.stringify(updateData),
     });
 
-    if (!response.ok) throw new Error(`Fallo al actualizar en el servidor: ${response.statusText}`);
+    if (!response.ok)
+      throw new Error(
+        `Fallo al actualizar en el servidor: ${response.statusText}`
+      );
     return true;
   } catch (error) {
     console.error("Error en updateTaskInApi:", error);
@@ -207,7 +229,7 @@ const asingStatus = (taskArticle, _id) => {
 
       const oldSection = oldStatus === "todo" ? todoSection : doneSection;
       const newSection = newStatus === "todo" ? todoSection : doneSection;
-      
+
       oldSection.removeChild(taskArticle);
       newSection.appendChild(taskArticle);
 
@@ -225,10 +247,14 @@ const activateDeleteButton = (_id, status) => {
   const deleteButton = document.getElementById(`${_id}-delete-button`);
   if (deleteButton) {
     deleteButton.classList.add("active");
-    deleteButton.addEventListener("click", (event) => {
-      event.preventDefault();
-      deleteTask(_id, status);
-    }, { once: true }); // Usamos once: true para asegurar que el listener se elimina tras el click
+    deleteButton.addEventListener(
+      "click",
+      (event) => {
+        event.preventDefault();
+        deleteTask(_id, status);
+      },
+      { once: true }
+    ); // Usamos once: true para asegurar que el listener se elimina tras el click
   }
 };
 
@@ -237,14 +263,19 @@ const deleteFromDocument = (_id, status) => {
   const taskArticle = document.getElementById(`${_id}`);
   taskArticle.classList.remove("article-show");
   taskArticle.classList.add("article-unshow");
-  
-  taskArticle.addEventListener("animationend", () => {
-    const section = status === "todo" ? todoSection : doneSection;
-    if (section.contains(taskArticle)) { // Verificación extra antes de remover
-      section.removeChild(taskArticle);
-    }
-    printCounters();
-  }, { once: true });
+
+  taskArticle.addEventListener(
+    "animationend",
+    () => {
+      const section = status === "todo" ? todoSection : doneSection;
+      if (section.contains(taskArticle)) {
+        // Verificación extra antes de remover
+        section.removeChild(taskArticle);
+      }
+      printCounters();
+    },
+    { once: true }
+  );
 };
 
 // --- Edit Title Logic ---
@@ -252,13 +283,17 @@ const deleteFromDocument = (_id, status) => {
 /** Asigna el evento click (para iniciar edición) al H3. */
 const asignEditEvent = (_id) => {
   const taskNameH3 = document.getElementById(`${_id}-task-name`);
-  
+
   // Usamos { once: true } para que el listener se auto-destruya después del click
   // Esto es clave para evitar conflictos cuando el H3 se reinserta en el DOM.
-  taskNameH3.addEventListener("click", (event) => {
-    event.preventDefault();
-    createEditInput(taskNameH3, _id);
-  }, { once: true }); 
+  taskNameH3.addEventListener(
+    "click",
+    (event) => {
+      event.preventDefault();
+      createEditInput(taskNameH3, _id);
+    },
+    { once: true }
+  );
 };
 
 /** Reemplaza el H3 con el input de edición. */
@@ -288,7 +323,9 @@ const asignKeydownEvent = (taskHeader, taskNameH3, editInput, _id) => {
       try {
         taskHeader.replaceChild(taskNameH3, editInput);
         asignEditEvent(_id); // Reasigna el listener de click al H3
-      } catch (e) { /* ignore if already gone */ }
+      } catch (e) {
+        /* ignore if already gone */
+      }
     }
   });
 };
@@ -303,7 +340,9 @@ const asignBlurEvent = (taskHeader, taskNameH3, editInput, _id) => {
       try {
         taskHeader.replaceChild(taskNameH3, editInput);
         asignEditEvent(_id); // Reasigna el listener de click al H3
-      } catch (e) { /* ignore if already gone */ }
+      } catch (e) {
+        /* ignore if already gone */
+      }
     }
   });
 };
@@ -318,7 +357,9 @@ const updateTaskName = async (_id, taskHeader, taskNameH3, editInput) => {
     try {
       taskHeader.replaceChild(taskNameH3, editInput);
       asignEditEvent(_id);
-    } catch (e) { /* ignore */ }
+    } catch (e) {
+      /* ignore */
+    }
     return;
   }
 
@@ -329,14 +370,16 @@ const updateTaskName = async (_id, taskHeader, taskNameH3, editInput) => {
   try {
     // Restauramos el H3 SÓLO si el input aún es un hijo.
     taskHeader.replaceChild(taskNameH3, editInput);
-  } catch (e) { /* ignore error si el blur ya lo hizo */ }
+  } catch (e) {
+    /* ignore error si el blur ya lo hizo */
+  }
 
   if (updateSuccessful) {
     // Actualizamos el H3 visible y la lista local si la API tuvo éxito.
-    taskNameH3.textContent = newTaskName; 
+    taskNameH3.textContent = newTaskName;
     const taskIndex = taskList.findIndex((task) => task._id === _id);
     if (taskIndex !== -1) taskList[taskIndex].title = newTaskName;
-  } 
+  }
 
   // 4. Reasignamos el listener de click al H3 (siempre, para evitar el error NotFound)
   asignEditEvent(_id);
@@ -367,8 +410,8 @@ newButton.addEventListener("click", (event) => {
 filterButtons.forEach((button) => {
   button.addEventListener("click", (event) => {
     event.preventDefault();
-    loadTasks(button.dataset.filter); // Carga y filtra
-    activateFilterButton(button);      // Activa el botón
+    getTasks(button.dataset.filter); // Carga y filtra
+    activateFilterButton(button); // Activa el botón
   });
 });
 
@@ -377,4 +420,4 @@ filterButtons.forEach((button) => {
 // ==========================
 
 printCurrentDate();
-loadTasks();
+getTasks();

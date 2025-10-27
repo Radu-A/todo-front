@@ -144,11 +144,13 @@ const handleLogin = async (event) => {
     // 3. ÉXITO (Status 200)
     const result = await res.json();
     console.log("Authentication successful. User data:", result.user);
+    // Save token
+    console.log("Token recibido", result.token);
+
+    localStorage.setItem("userToken", result.token);
 
     // 4. REDIRECCIÓN AL ÉXITO (Punto 1)
     const baseUrl = `${window.location.origin}/todo-front`;
-    console.log(baseUrl);
-    console.log(`${baseUrl}/index.html`);
     window.location.href = `${baseUrl}/index.html`;
   } catch (err) {
     // 5. MANEJO DEL ERROR y Muestra de Mensaje
