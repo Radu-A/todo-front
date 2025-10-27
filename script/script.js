@@ -3,6 +3,7 @@
 // ==========================
 
 // --- DOM ELEMENTS ---
+const logoutButton = document.getElementById("logout-button");
 const todoSection = document.getElementById("todo-section");
 const doneSection = document.getElementById("done-section");
 const currentDate = document.getElementById("current-day");
@@ -65,6 +66,25 @@ const activateFilterButton = (clickedButton) => {
   });
 };
 
+const getToken = () => {
+  const token = localStorage.getItem("userToken");
+
+  if (!token) {
+    console.error("No hay token de sesión. Redirigiendo a login");
+    const baseUrl = `${window.location.origin}/todo-front`;
+    window.location.href = `${baseUrl}/pages/login.html`;
+  }
+  return token;
+};
+
+const handleLogout = () => {
+  console.log("Loggin out user...");
+  localStorage.removeItem("userToken");
+  // localStorage.removeItem('userName');
+  const baseUrl = `${window.location.origin}/todo-front`;
+  window.location.href = `${baseUrl}/pages/login.html`;
+};
+
 // ==========================
 // 3. TASK RENDERING AND LIFECYCLE
 // ==========================
@@ -107,14 +127,7 @@ const printTask = (_id, taskName, status) => {
 
 /** Carga todas las tareas desde la API (GET). */
 const getTasks = async (filterStatus = "all") => {
-  const token = localStorage.getItem("userToken");
-
-  if (!token) {
-    console.error("No hay token de sesión. Redirigiendo a login");
-    const baseUrl = `${window.location.origin}/todo-front`;
-    window.location.href = `${baseUrl}/pages/login.html`;
-  }
-
+  const token = getToken();
   clearTasks();
   try {
     const response = await fetch(API_URL, {
@@ -140,12 +153,16 @@ const getTasks = async (filterStatus = "all") => {
 
 /** Crea una nueva tarea en la API (POST). */
 const createTask = async (taskName) => {
+  const token = getToken();
   const taskData = { title: taskName };
 
   try {
     const response = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(taskData),
     });
 
@@ -162,10 +179,14 @@ const createTask = async (taskName) => {
 
 /** Elimina una tarea de la API y el DOM (DELETE). */
 const deleteTask = async (_id, status) => {
+  const token = getToken();
   try {
     const response = await fetch(`${API_URL}/${_id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
     });
 
     if (!response.ok) throw new Error("Fallo al eliminar la tarea.");
@@ -185,10 +206,14 @@ const deleteTask = async (_id, status) => {
  * @returns {boolean} True si la actualización fue exitosa.
  */
 const updateTaskInApi = async (_id, updateData) => {
+  const token = getToken();
   try {
     const response = await fetch(`${API_URL}/${_id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(updateData),
     });
 
@@ -388,6 +413,12 @@ const updateTaskName = async (_id, taskHeader, taskNameH3, editInput) => {
 // ==========================
 // 6. EVENT LISTENERS SETUP
 // ==========================
+
+// Listener to logout
+logoutButton.addEventListener("click", (event) => {
+  event.preventDefault();
+  handleLogout();
+});
 
 // Listener para añadir tarea con Enter en el input.
 newInput.addEventListener("keydown", (event) => {
