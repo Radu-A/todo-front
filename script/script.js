@@ -15,7 +15,7 @@ const filterButtons = [...document.getElementsByClassName("filter-button")];
 // Almacena las tareas cargadas de la API.
 let taskList = [];
 // URL del backend (puertos separados requieren la URL absoluta).
-const API_URL = "http://localhost:5000/api/tasks";
+const API_URL = "https://todo-server-mb4v.onrender.com/api/tasks";
 
 // ==========================
 // 2. COMMON UTILITIES
@@ -71,7 +71,7 @@ const getToken = () => {
 
   if (!token) {
     console.error("No hay token de sesión. Redirigiendo a login");
-    const baseUrl = `${window.location.origin}/todo-front`;
+    const baseUrl = `${window.location.origin}`;
     window.location.href = `${baseUrl}/pages/login.html`;
   }
   return token;
@@ -81,7 +81,7 @@ const handleLogout = () => {
   console.log("Loggin out user...");
   localStorage.removeItem("userToken");
   // localStorage.removeItem('userName');
-  const baseUrl = `${window.location.origin}/todo-front`;
+  const baseUrl = `${window.location.origin}`;
   window.location.href = `${baseUrl}/pages/login.html`;
 };
 

@@ -1,7 +1,7 @@
 // ==================
 // VARIABLES
 // ==================
-const server = "http://localhost:5000/api";
+const server = "https://todo-server-mb4v.onrender.com/api";
 const emailAuthInput = document.getElementById("email-auth-input");
 const passwordAuthInput = document.getElementById("password-auth-input");
 const repeatAuthInput = document.getElementById("repeat-auth-input");
@@ -189,7 +189,7 @@ const handleLogin = async (event) => {
 
     localStorage.setItem("userToken", result.token); // 4. REDIRECCIÓN AL ÉXITO (Punto 1)
 
-    const baseUrl = `${window.location.origin}/todo-front`;
+    const baseUrl = `${window.location.origin}`;
     window.location.href = `${baseUrl}/index.html`;
   } catch (err) {
     // 5. MANEJO DEL ERROR y Muestra de Mensaje
@@ -240,7 +240,7 @@ const handleRegister = async () => {
     console.log("Registration successful:", result.message);
     // Login and redirect
     await handleLogin();
-    const baseUrl = `${window.location.origin}/todo-front`;
+    const baseUrl = `${window.location.origin}`;
     window.location.href = `${baseUrl}/index.html`;
   } catch (error) {
     // 3. Catch and display the error message to the user
