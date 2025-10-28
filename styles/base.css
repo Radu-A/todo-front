@@ -46,6 +46,10 @@ section {
   max-width: 450px;
 }
 
+.container {
+  margin-bottom: 4rem;
+}
+
 article {
   display: flex;
   justify-content: space-between;
