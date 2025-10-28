@@ -1,7 +1,7 @@
 // ==================
 // VARIABLES
 // ==================
-const server = "http://localhost:5000/api/auth";
+const server = "http://localhost:5000/api";
 const emailAuthInput = document.getElementById("email-auth-input");
 const passwordAuthInput = document.getElementById("password-auth-input");
 const repeatAuthInput = document.getElementById("repeat-auth-input");
@@ -152,7 +152,7 @@ const handleLogin = async (event) => {
   console.log("Sending login request to server...");
 
   try {
-    const res = await fetch(server, {
+    const res = await fetch(`${server}/auth`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -196,6 +196,27 @@ const showLoginError = (message) => {
 };
 
 // ==================
+// REGISTER
+// ==================
+const handleRegister = () => {
+  const data = {
+    userName: nameAuthInput.value,
+    email: emailAuthInput.value,
+    password: passwordAuthInput.value,
+  };
+  try {
+    const response = fetch(`${server}/user`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    console.log("Successful register.");
+  } catch (error) {
+    console.error("Something went wrong: ", error);
+  }
+};
+
+// ==================
 // EVENT LISTENERS
 // ==================
 
@@ -219,14 +240,30 @@ if (repeatAuthInput) {
   });
 }
 
-// Listener para el envío del formulario
-loginForm.addEventListener("submit", (event) => {
-  event.preventDefault();
+// Listener para el envío del formulario login
+if (loginForm) {
+  loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
 
-  if (formValidation()) {
-    console.log("¡Validación exitosa! Enviando datos al servidor...");
-    handleLogin(event);
-  } else {
-    console.log("Error de validación. Por favor, revisa los campos.");
-  }
-});
+    if (formValidation()) {
+      console.log("¡Validación exitosa! Enviando datos al servidor...");
+      handleLogin(event);
+    } else {
+      console.log("Error de validación. Por favor, revisa los campos.");
+    }
+  });
+}
+
+// Listener para el envío del formulario registro
+if (registerForm) {
+  registerForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    if (formValidation()) {
+      console.log("¡Validación exitosa! Enviando datos al servidor...");
+      handleRegister(event);
+    } else {
+      console.log("Error de validación. Por favor, revisa los campos.");
+    }
+  });
+}

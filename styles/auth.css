@@ -18,6 +18,7 @@
 
 .auth-section {
   /* Hace que la caja de login sea distinta, sobrescribiendo el estilo genérico de 'section' */
+  margin-bottom: 1rem;
   padding: 2rem;
   border: 1px solid var(--color-secondary);
   border-radius: 0.5rem;
