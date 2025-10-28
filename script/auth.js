@@ -223,21 +223,25 @@ const handleRegister = async () => {
   }; // Clear previous error messages (assuming you have a way to display them) // clearErrorMessages();
 
   console.log("Sending registration request to server...");
-
+  // Fetch to userController/createUser
   try {
     const response = await fetch(`${server}/user`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
-    }); // 1. Check for non-2xx status codes (400, 409, 500)
-
+    });
+    // 1. Check for non-2xx status codes (400, 409, 500)
     if (!response.ok) {
       const errorData = await response.json(); // Throw the message from the server (e.g., "This email is already registered")
       throw new Error(errorData.message || `HTTP Error: ${response.status}`);
-    } // 2. SUCCESS (Status 201)
-
+    }
+    // 2. SUCCESS (Status 201)
     const result = await response.json();
-    console.log("Registration successful:", result.message); // Optional: Redirect to login page after successful registration // window.location.href = "login.html";
+    console.log("Registration successful:", result.message);
+    // Login and redirect
+    await handleLogin();
+    const baseUrl = `${window.location.origin}/todo-front`;
+    window.location.href = `${baseUrl}/index.html`;
   } catch (error) {
     // 3. Catch and display the error message to the user
     console.error("Registration failed:", error.message); // showErrorMessage(error.message); // Implement a function to show this message on the page
