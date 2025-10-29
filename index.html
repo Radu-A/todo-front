@@ -14,9 +14,16 @@
   <body>
     <header>
       <div id="header-container">
-        <h1>My Day</h1>
+        <!-- <h1>To-Do List</h1> -->
         <time id="current-day"></time>
-        <button id="logout-button">Log out</button>
+        <div id="user-menu-container">
+          <button id="avatar">?</button>
+
+          <div id="user-dropdown" class="hidden">
+            <p id="username-display"></p>
+            <div id="dropdown-logout-button" class="dropdown-link">Log out</div>
+          </div>
+        </div>
       </div>
     </header>
     <main>

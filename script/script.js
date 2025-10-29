@@ -4,6 +4,10 @@
 
 // --- DOM ELEMENTS ---
 const logoutButton = document.getElementById("logout-button");
+const avatar = document.getElementById("avatar");
+const userDropdown = document.getElementById("user-dropdown");
+const usernameDisplay = document.getElementById("username-display");
+const dropdownLogoutButton = document.getElementById("dropdown-logout-button");
 const todoSection = document.getElementById("todo-section");
 const doneSection = document.getElementById("done-section");
 const currentDate = document.getElementById("current-day");
@@ -411,11 +415,44 @@ const updateTaskName = async (_id, taskHeader, taskNameH3, editInput) => {
 };
 
 // ==========================
+// 6. SHOW USER NAME
+// ==========================
+// Decode payload form JWT
+const decodeJwt = (token) => {
+  try {
+    const parts = token.split(".");
+    const payload = parts[1];
+    const decodedPayload = JSON.parse(atob(payload));
+    return decodedPayload;
+  } catch (error) {
+    console.error("Error al decodificar el token: ", e);
+    return null;
+  }
+};
+
+const getUserData = () => {
+  const token = getToken();
+  const username = decodeJwt(token).username;
+  const initial = decodeJwt(token).username[0].toUpperCase();
+  console.log(initial);
+
+  avatar.textContent = initial;
+  usernameDisplay.textContent = `${username}`;
+};
+
+getUserData();
+
+// ==========================
 // 6. EVENT LISTENERS SETUP
 // ==========================
 
-// Listener to logout
-logoutButton.addEventListener("click", (event) => {
+// Listener para mostrar/ocultar el user-dropdown al hacer click en el avatar
+avatar.addEventListener("click", () => {
+  userDropdown.classList.toggle("hidden");
+});
+
+// Listener para cerrar sesión desde el dropdown
+dropdownLogoutButton.addEventListener("click", (event) => {
   event.preventDefault();
   handleLogout();
 });

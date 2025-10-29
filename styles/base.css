@@ -105,6 +105,70 @@ header {
   text-decoration: none;
 }
 
+#avatar {
+  width: 2rem;
+  height: 2rem;
+  padding: 0.3rem;
+  border: none;
+  border-radius: 0.3rem;
+  background-color: var(--color-accent);
+  font-family: inherit;
+  color: var(--color-light);
+  cursor: pointer;
+}
+
+/* Contenedor del avatar y el menú para posicionar el dropdown */
+#user-menu-container {
+  position: relative;
+}
+
+/* Estilo del menú desplegable */
+#user-dropdown {
+  position: absolute;
+  top: 100%; /* Posiciona debajo del avatar */
+  right: 0;
+  z-index: 1000;
+  min-width: 150px;
+  background-color: var(--color-light);
+  border: 1px solid var(--color-accent);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+}
+
+/* Clases para mostrar/ocultar */
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+/* Estilo del nombre de usuario dentro del dropdown */
+#username-display {
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  border-bottom: 1px solid var(--color-bg);
+  margin-bottom: 0.5rem;
+}
+
+/* Estilo del enlace de Log out */
+.dropdown-link {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  color: var(--color-accent);
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.dropdown-link:hover {
+  background-color: var(--color-bg);
+  color: var(--color-primary);
+}
+
 /* =============== */
 /* FOOTER */
 /* =============== */
