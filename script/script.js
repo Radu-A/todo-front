@@ -422,8 +422,17 @@ const decodeJwt = (token) => {
   try {
     const parts = token.split(".");
     const payload = parts[1];
-    const decodedPayload = JSON.parse(atob(payload));
-    return decodedPayload;
+    // 1. Reemplazar caracteres no seguros para URL (esto se hace a veces con JWT)
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+
+    // 2. Usar atob() para decodificar la Base64 a una cadena binaria
+    const raw = atob(base64);
+
+    // 3. Forzar la interpretación de la cadena binaria como UTF-8
+    //    Usamos decodeURIComponent() y escape() para manejar correctamente los caracteres multibyte (UTF-8).
+    const decodedPayload = decodeURIComponent(escape(raw));
+
+    return JSON.parse(decodedPayload);
   } catch (error) {
     console.error("Error al decodificar el token: ", e);
     return null;

@@ -14,14 +14,19 @@
   <body>
     <header>
       <div id="header-container">
-        <!-- <h1>To-Do List</h1> -->
-        <time id="current-day"></time>
-        <div id="user-menu-container">
-          <button id="avatar">?</button>
-
-          <div id="user-dropdown" class="hidden">
-            <p id="username-display"></p>
-            <div id="dropdown-logout-button" class="dropdown-link">Log out</div>
+        <div id="header-left">
+          <h1>To-Do List</h1>
+          <time id="current-day"></time>
+        </div>
+        <div id="header-right" class="visible">
+          <div id="user-menu-container">
+            <button id="avatar">?</button>
+            <div id="user-dropdown" class="hidden">
+              <p id="username-display"></p>
+              <div id="dropdown-logout-button" class="dropdown-link">
+                Log out
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -72,7 +77,9 @@
       </div>
     </main>
     <footer class="app-footer">
-      <p>&copy; <span id="current-year"></span>ToDo List | Víctor Outeiro</p>
+      <p>
+        &copy; <span id="current-year">2025</span> ToDo List | Víctor Outeiro
+      </p>
       <p>All Rights Reserved.</p>
     </footer>
     <script src="./script/script.js"></script>
