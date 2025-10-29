@@ -33,7 +33,6 @@ body {
 
 main {
   flex: 1;
-  display: grid;
 }
 
 section {
@@ -48,6 +47,7 @@ section {
 
 .container {
   margin-bottom: 4rem;
+  display: grid;
 }
 
 article {
@@ -133,4 +133,14 @@ footer {
 .task-count-info {
   font-weight: 800;
   color: var(--color-accent);
+}
+
+/* =============== */
+/* MEDIA QUERIES */
+/* =============== */
+
+@media (min-width: 1000px) {
+  .container {
+    grid-template-columns: 1fr 1fr;
+  }
 }
