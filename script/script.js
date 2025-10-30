@@ -8,8 +8,8 @@ const avatar = document.getElementById("avatar");
 const userDropdown = document.getElementById("user-dropdown");
 const usernameDisplay = document.getElementById("username-display");
 const dropdownLogoutButton = document.getElementById("dropdown-logout-button");
-const todoSection = document.getElementById("todo-section");
-const doneSection = document.getElementById("done-section");
+const todoContainer = document.getElementById("todo-container");
+const doneContainer = document.getElementById("done-container");
 const currentDate = document.getElementById("current-day");
 const newInput = document.getElementById("new-input");
 const newButton = document.getElementById("new-button");
@@ -38,10 +38,8 @@ const printCurrentDate = () => {
 
 /** Restaura las secciones ToDo y Done a su estado inicial. */
 const clearTasks = () => {
-  todoSection.innerHTML = `
-    <div class="section-header"><h2>ToDo</h2><span class="counter" id="todo-counter"></span></div>`;
-  doneSection.innerHTML = `
-    <div class="section-header"><h2>Done</h2><span class="counter" id="done-counter"></span></div>`;
+  todoContainer.innerHTML = ``;
+  doneContainer.innerHTML = ``;
 };
 
 /** Filtra la lista local de tareas por status ('all', 'todo', 'done'). */
@@ -111,7 +109,7 @@ const printTask = (_id, taskName, status) => {
     <button class="delete-button" id="${_id}-delete-button"></button>`;
 
   // Determina la sección de destino
-  const section = status === "todo" ? todoSection : doneSection;
+  const section = status === "todo" ? todoContainer : doneContainer;
   section.appendChild(taskArticle);
 
   // Activa la animación CSS
@@ -233,7 +231,86 @@ const updateTaskInApi = async (_id, updateData) => {
 };
 
 // ==========================
-// 5. EVENT HANDLERS AND DOM LOGIC
+// 5. SHOW USER NAME
+// ==========================
+// Decode payload form JWT
+const decodeJwt = (token) => {
+  try {
+    const parts = token.split(".");
+    const payload = parts[1];
+    // 1. Reemplazar caracteres no seguros para URL (esto se hace a veces con JWT)
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+
+    // 2. Usar atob() para decodificar la Base64 a una cadena binaria
+    const raw = atob(base64);
+
+    // 3. Forzar la interpretación de la cadena binaria como UTF-8
+    //    Usamos decodeURIComponent() y escape() para manejar correctamente los caracteres multibyte (UTF-8).
+    const decodedPayload = decodeURIComponent(escape(raw));
+
+    return JSON.parse(decodedPayload);
+  } catch (error) {
+    console.error("Error al decodificar el token: ", e);
+    return null;
+  }
+};
+
+const getUserData = () => {
+  const token = getToken();
+  const username = decodeJwt(token).username;
+  const initial = decodeJwt(token).username[0].toUpperCase();
+  console.log(initial);
+
+  avatar.textContent = initial;
+  usernameDisplay.textContent = `${username}`;
+};
+
+getUserData();
+
+// ==========================
+// 5. REORDERING LOGIC
+// ==========================
+/**
+ * Maneja el reordenamiento de tareas en el DOM y en la lista local.
+ * **Esta función debe ser completada con la llamada a la API de reordenamiento.**
+ * @param {string} _id ID de la tarea arrastrada.
+ * @param {number} newIndex La nueva posición de la tarea.
+ * @param {number} oldIndex La posición original de la tarea.
+ */
+const handleTaskReorder = (_id, newIndex, oldIndex) => {
+  // 1. Encontrar la tarea movida
+  const taskToMove = taskList.find((task) => task._id === _id);
+  if (!taskToMove) return;
+
+  // 2. Determinar si el movimiento ocurrió en la lista 'todo' o 'done'
+  const targetStatus = taskToMove.status;
+
+  // 3. Crear una lista filtrada (solo tareas con el mismo estado) para aplicar el reordenamiento local
+  const currentStatusList = taskList.filter(
+    (task) => task.status === targetStatus
+  );
+
+  // 4. Mover el elemento dentro de la lista filtrada (actualización local)
+  currentStatusList.splice(oldIndex, 1); // Quitar de la posición antigua
+  currentStatusList.splice(newIndex, 0, taskToMove); // Insertar en la posición nueva
+
+  // 5. Opcional: Reconstruir taskList o actualizar la propiedad 'order' de las tareas afectadas.
+  // La implementación de la propiedad 'order' depende de cómo la maneje tu backend.
+  // Por ahora, solo ordenaremos la lista local 'taskList' completamente para reflejar el DOM.
+
+  // Opción 1 (Simple pero menos eficiente): Sobreescribir taskList con el nuevo orden.
+  // Esta parte es compleja sin una propiedad 'order' y una API para guardarla.
+  // Si tu API no soporta reordenamiento, este paso es solo visual en el frontend.
+  // Si lo soporta, cada tarea reordenada debería ser enviada al servidor con su nueva posición.
+
+  console.log(`Tarea ${_id} movida de ${oldIndex} a ${newIndex}.`);
+
+  // Aquí es donde llamarías a la función de API:
+  // saveNewOrderToApi(currentStatusList.map(task => task._id), targetStatus);
+};
+
+// ==========================
+// 6. EVENT HANDLERS AND DOM LOGIC
 // ==========================
 
 /** Maneja el cambio de status (todo <-> done) y la animación de movimiento. */
@@ -256,8 +333,8 @@ const asingStatus = (taskArticle, _id) => {
       taskArticle.classList.remove("article-show");
       statusIcon.classList.replace(oldStatus, newStatus);
 
-      const oldSection = oldStatus === "todo" ? todoSection : doneSection;
-      const newSection = newStatus === "todo" ? todoSection : doneSection;
+      const oldSection = oldStatus === "todo" ? todoContainer : doneContainer;
+      const newSection = newStatus === "todo" ? todoContainer : doneContainer;
 
       oldSection.removeChild(taskArticle);
       newSection.appendChild(taskArticle);
@@ -296,7 +373,7 @@ const deleteFromDocument = (_id, status) => {
   taskArticle.addEventListener(
     "animationend",
     () => {
-      const section = status === "todo" ? todoSection : doneSection;
+      const section = status === "todo" ? todoContainer : doneContainer;
       if (section.contains(taskArticle)) {
         // Verificación extra antes de remover
         section.removeChild(taskArticle);
@@ -415,44 +492,7 @@ const updateTaskName = async (_id, taskHeader, taskNameH3, editInput) => {
 };
 
 // ==========================
-// 6. SHOW USER NAME
-// ==========================
-// Decode payload form JWT
-const decodeJwt = (token) => {
-  try {
-    const parts = token.split(".");
-    const payload = parts[1];
-    // 1. Reemplazar caracteres no seguros para URL (esto se hace a veces con JWT)
-    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
-
-    // 2. Usar atob() para decodificar la Base64 a una cadena binaria
-    const raw = atob(base64);
-
-    // 3. Forzar la interpretación de la cadena binaria como UTF-8
-    //    Usamos decodeURIComponent() y escape() para manejar correctamente los caracteres multibyte (UTF-8).
-    const decodedPayload = decodeURIComponent(escape(raw));
-
-    return JSON.parse(decodedPayload);
-  } catch (error) {
-    console.error("Error al decodificar el token: ", e);
-    return null;
-  }
-};
-
-const getUserData = () => {
-  const token = getToken();
-  const username = decodeJwt(token).username;
-  const initial = decodeJwt(token).username[0].toUpperCase();
-  console.log(initial);
-
-  avatar.textContent = initial;
-  usernameDisplay.textContent = `${username}`;
-};
-
-getUserData();
-
-// ==========================
-// 6. EVENT LISTENERS SETUP
+// 7. EVENT LISTENERS SETUP
 // ==========================
 
 // Listener para mostrar/ocultar el user-dropdown al hacer click en el avatar
@@ -464,6 +504,24 @@ avatar.addEventListener("click", () => {
 dropdownLogoutButton.addEventListener("click", (event) => {
   event.preventDefault();
   handleLogout();
+});
+
+// Listener para cerrar el user-dropdown al pinchar fuera de él
+document.addEventListener("click", (event) => {
+  // 1. Obtener el contenedor principal del menú
+  const menuContainer = document.getElementById("user-menu-container");
+
+  // 2. Comprobar si el menú está visible. Si no lo está, no hacemos nada.
+  if (userDropdown.classList.contains("hidden")) {
+    return;
+  }
+
+  // 3. Comprobar si el clic ocurrió FUERA del contenedor del menú (avatar incluido)
+  //    .contains(event.target) comprueba si el elemento clicado (event.target) es un descendiente de menuContainer.
+  if (!menuContainer.contains(event.target)) {
+    // El clic fue fuera -> ocultar el menú
+    userDropdown.classList.add("hidden");
+  }
 });
 
 // Listener para añadir tarea con Enter en el input.
@@ -493,8 +551,36 @@ filterButtons.forEach((button) => {
 });
 
 // ==========================
-// 7. APPLICATION START
+// 8. APPLICATION START
 // ==========================
 
 printCurrentDate();
 getTasks();
+
+// ==========================
+// 9. INITIALIZATION SORTABLE
+// ==========================
+
+/** Inicializa Sortable para la lista 'ToDo' */
+new Sortable(todoContainer, {
+  group: "todoGroup", // Esencial para evitar mover elementos a 'doneGroup'
+  animation: 150,
+  ghostClass: "sortable-ghost", // Clase CSS para el elemento 'fantasma' (placeholder)
+  filter: ".section-header",
+  onEnd: function (evt) {
+    // Lógica para actualizar el orden en el backend
+    handleTaskReorder(evt.item.id, evt.newIndex, evt.oldIndex);
+  },
+});
+
+/** Inicializa Sortable para la lista 'Done' */
+new Sortable(doneContainer, {
+  group: "doneGroup", // Esencial para evitar mover elementos a 'todoGroup'
+  animation: 150,
+  ghostClass: "sortable-ghost",
+  filter: ".section-header",
+  onEnd: function (evt) {
+    // Lógica para actualizar el orden en el backend
+    handleTaskReorder(evt.item.id, evt.newIndex, evt.oldIndex);
+  },
+});

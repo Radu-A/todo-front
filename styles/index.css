@@ -90,6 +90,17 @@
 }
 
 /* =============== */
+/* TASK CONTAINER */
+/* =============== */
+
+#todo-container,
+#done-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* =============== */
 /* SECTION HEADER */
 /* =============== */
 
@@ -190,6 +201,24 @@
 
 .active {
   display: block;
+}
+
+/* =============== */
+/* SORTABLE.JS STYLES */
+/* =============== */
+
+/* Estilo para el elemento "fantasma" que queda en el hueco */
+.sortable-ghost {
+  opacity: 0.4;
+  background-color: var(--color-bg);
+  border: 1px dashed var(--color-secondary);
+}
+
+/* Estilo para el elemento que el usuario está arrastrando */
+.sortable-drag {
+  opacity: 1;
+  transform: rotate(2deg); /* Pequeña rotación para simular el arrastre */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Sombra para que flote */
 }
 
 /* =============== */
