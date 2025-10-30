@@ -277,36 +277,69 @@ getUserData();
  * @param {number} newIndex La nueva posición de la tarea.
  * @param {number} oldIndex La posición original de la tarea.
  */
-const handleTaskReorder = (_id, newIndex, oldIndex) => {
-  // 1. Encontrar la tarea movida
+/**
+ * Maneja el reordenamiento de tareas en el DOM y en la lista local.
+ * Llama a la API para persistir el nuevo orden.
+ * @param {string} _id ID de la tarea arrastrada.
+ * @param {number} newIndex La nueva posición de la tarea.
+ * @param {number} oldIndex La posición original de la tarea.
+ */
+const handleTaskReorder = async (_id, newIndex, oldIndex) => {
+  // 1. Encontrar la tarea movida en la lista local
   const taskToMove = taskList.find((task) => task._id === _id);
-  if (!taskToMove) return;
+  if (!taskToMove) {
+    console.error("Task not found in local list.");
+    return;
+  }
+  const status = taskToMove.status; // 'todo' or 'done'
 
-  // 2. Determinar si el movimiento ocurrió en la lista 'todo' o 'done'
-  const targetStatus = taskToMove.status;
+  // 2. Actualización OPTIMISTA del estado local (actualiza el DOM visualmente)
+  // Filtra la lista por el status correcto
+  const currentStatusList = taskList
+    .filter((task) => task.status === status)
+    .sort((a, b) => a.position - b.position); // Asegura el orden correcto
 
-  // 3. Crear una lista filtrada (solo tareas con el mismo estado) para aplicar el reordenamiento local
-  const currentStatusList = taskList.filter(
-    (task) => task.status === targetStatus
-  );
+  // Mueve el elemento en esta lista filtrada
+  const [movedItem] = currentStatusList.splice(oldIndex, 1);
+  currentStatusList.splice(newIndex, 0, movedItem);
 
-  // 4. Mover el elemento dentro de la lista filtrada (actualización local)
-  currentStatusList.splice(oldIndex, 1); // Quitar de la posición antigua
-  currentStatusList.splice(newIndex, 0, taskToMove); // Insertar en la posición nueva
+  // 3. Re-asignar la propiedad 'position' en la lista local 'taskList'
+  // Esto es VITAL para que los siguientes "drag and drop" tengan el 'oldIndex' correcto.
+  currentStatusList.forEach((task, index) => {
+    const globalTask = taskList.find((t) => t._id === task._id);
+    if (globalTask) globalTask.position = index;
+  });
 
-  // 5. Opcional: Reconstruir taskList o actualizar la propiedad 'order' de las tareas afectadas.
-  // La implementación de la propiedad 'order' depende de cómo la maneje tu backend.
-  // Por ahora, solo ordenaremos la lista local 'taskList' completamente para reflejar el DOM.
+  // 4. Llamar a la API para guardar el cambio en el backend
+  try {
+    const token = getToken();
+    const response = await fetch(`${API_URL}/${_id}/reorder`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        oldPosition: oldIndex, // El 'oldIndex' de Sortable.js
+        newPosition: newIndex, // El 'newIndex' de Sortable.js
+        status: status,
+      }),
+    });
 
-  // Opción 1 (Simple pero menos eficiente): Sobreescribir taskList con el nuevo orden.
-  // Esta parte es compleja sin una propiedad 'order' y una API para guardarla.
-  // Si tu API no soporta reordenamiento, este paso es solo visual en el frontend.
-  // Si lo soporta, cada tarea reordenada debería ser enviada al servidor con su nueva posición.
+    if (!response.ok) {
+      throw new Error("Failed to save reorder to server.");
+    }
 
-  console.log(`Tarea ${_id} movida de ${oldIndex} a ${newIndex}.`);
-
-  // Aquí es donde llamarías a la función de API:
-  // saveNewOrderToApi(currentStatusList.map(task => task._id), targetStatus);
+    console.log(`Tarea ${_id} movida de ${oldIndex} a ${newIndex} y guardada.`);
+  } catch (error) {
+    console.error("Error saving reorder:", error);
+    // Si la API falla, el DOM está desincronizado con la DB.
+    // Forzamos una recarga para volver al estado real de la DB.
+    alert("Error al guardar el orden. Recargando la lista.");
+    const currentFilter =
+      document.querySelector(".filter-active").dataset.filter;
+    getTasks(currentFilter); // Recargar
+  }
 };
 
 // ==========================
