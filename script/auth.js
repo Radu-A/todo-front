@@ -313,7 +313,7 @@ function handleGoogleCredentialResponse(response) {
  */
 const sendGoogleTokenToBackend = async (token) => {
   try {
-    const res = await fetch(`${server}/google`, {
+    const res = await fetch(`${server}/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: token }),
@@ -337,7 +337,7 @@ const sendGoogleTokenToBackend = async (token) => {
   } catch (err) {
     // Muestra el error (puedes reusar showLoginError)
     console.error("Google login failed:", err.message);
-    showLoginError(err.message || "Error al iniciar sesión con Google.");
+    showLoginError("Error al iniciar sesión con Google.");
   }
 };
 
