@@ -1,7 +1,8 @@
 // ==================
 // VARIABLES
 // ==================
-const server = "https://todo-server-mb4v.onrender.com/api";
+const server = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api";
+// const server = "https://todo-server-mb4v.onrender.com/api";
 const emailAuthInput = document.getElementById("email-auth-input");
 const passwordAuthInput = document.getElementById("password-auth-input");
 const repeatAuthInput = document.getElementById("repeat-auth-input");
