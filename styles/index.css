@@ -1,5 +1,13 @@
-/* Importar reglas base */
+/* Import base rules */
 @import url("./base.css");
+
+/* REFACTOR: Added .container layout here, moved from base.css 
+  as it is specific to the index page layout.
+*/
+.container {
+  margin-bottom: 4rem;
+  display: grid;
+}
 
 /* =============== */
 /* NEW TASK SECTION */
@@ -8,16 +16,22 @@
 #new-article {
   background-color: var(--color-accent);
   color: var(--color-light);
+  /* These styles override the .todo-article styles below */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 3rem;
+  padding: 0 1.5rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 0.5rem;
 }
 
-/* Animación para el contenedor de la nueva tarea */
+/* Animation for the new task container */
 #new-article:focus-within {
-  /* Añade una sombra para que "flote" ligeramente */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   scale: 1.02;
-  /* Asegura una transición suave */
-  transition: scale 0.3s ease;
-  transition: box-shadow 0.3s ease;
+  transition: scale 0.3s ease, box-shadow 0.3s ease;
 }
 
 #new-input {
@@ -51,10 +65,9 @@
   color: var(--color-light);
 }
 
-/* Animación para el botón "Add" */
+/* "Add" button animation */
 #new-button:hover,
 #new-button:focus {
-  /* Invierte los colores (relleno con el color de acento y texto claro) */
   background-color: var(--color-light);
   color: var(--color-accent);
   border: 1px solid var(--color-accent);
@@ -119,20 +132,31 @@
 /* TASK ARTICLE */
 /* =============== */
 
-/* Estilo para el contenedor de la tarea al pasar el ratón */
-.todo-article:hover,
-.done-article:hover {
-  background-color: var(
-    --color-bg
-  ); /* Necesitarás definir este color, ej: un blanco muy sutilmente grisáceo */
+/* REFACTOR: Moved these styles from base.css (where it was 'article')
+  to index.css and used the correct class '.todo-article'.
+*/
+.todo-article {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 3rem;
+  padding: 0 1.5rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 0.5rem;
+}
+
+/* Hover style for the task container */
+.todo-article:hover {
+  background-color: var(--color-bg);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-  /* La animación hace que el cambio sea suave */
   transition: all 0.2s ease;
 }
 
-/* Mostrar el botón de borrar solo al hacer hover sobre la tarea */
-.task-article:hover .delete-button {
-  display: block; /* O flex, dependiendo de tu diseño interno */
+/* Show delete button only on task hover */
+/* REFACTOR: Changed '.task-article' to '.todo-article' to match HTML */
+.todo-article:hover .delete-button {
+  display: block;
 }
 
 .task-header {
@@ -207,18 +231,18 @@
 /* SORTABLE.JS STYLES */
 /* =============== */
 
-/* Estilo para el elemento "fantasma" que queda en el hueco */
+/* Style for the "ghost" element (placeholder) */
 .sortable-ghost {
   opacity: 0.4;
   background-color: var(--color-bg);
   border: 1px dashed var(--color-secondary);
 }
 
-/* Estilo para el elemento que el usuario está arrastrando */
+/* Style for the element being dragged */
 .sortable-drag {
   opacity: 1;
-  transform: rotate(2deg); /* Pequeña rotación para simular el arrastre */
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Sombra para que flote */
+  transform: rotate(2deg);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 /* =============== */
@@ -260,15 +284,17 @@
 /* =============== */
 
 @media (min-width: 1000px) {
-  /* 1. Resetear el margen de centrado para que justify-self funcione */
+  /* REFACTOR: Moved .container media query from base.css */
+  .container {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Reset margin-auto for grid alignment */
   #new-section,
   #filter-section,
   #todo-section,
   #done-section {
-    margin: 1rem 0 1rem 0; /* Aplicamos solo margen vertical (1rem), y quitamos el auto */
-    /* Nota: Puedes usar margin: initial; si quieres eliminarlo por completo,
-           o simplemente margin: 1rem; si quieres 1rem en todos los lados.
-           Yo he usado 1rem 0 1rem 0 para mantener solo el vertical que ya usas. */
+    margin: 1rem 0 1rem 0;
   }
   #new-section {
     grid-column: 1/3;

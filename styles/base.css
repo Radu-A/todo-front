@@ -32,14 +32,13 @@ body {
 }
 
 main {
+  /* Ensures the main content area expands to fill available space */
   flex: 1;
 }
 
-.container {
-  margin-bottom: 4rem;
-  display: grid;
-}
-
+/* Mobile-first (narrow screen) layout.
+  This is overridden by auth.css and index.css for specific pages.
+*/
 section {
   display: flex;
   flex-direction: column;
@@ -48,17 +47,6 @@ section {
   margin-top: 1rem;
   width: 95%;
   max-width: 450px;
-}
-
-article {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: 3rem;
-  padding: 0 1.5rem;
-  border: 1px solid var(--color-accent);
-  border-radius: 0.5rem;
 }
 
 h1 {
@@ -83,14 +71,14 @@ h3 {
 header {
   padding: 1rem;
   border-bottom: 1px solid var(--color-accent);
-  color: var(--color-);
+  /* REFACTOR: Fixed missing variable. Was var(--color-); */
+  color: var(--color-primary);
 }
 
 #header-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* width: 95%; */
   max-width: 450px;
   margin: 0 auto;
 }
@@ -105,13 +93,14 @@ header {
   font-family: inherit;
   font-size: 2rem;
   color: var(--color-light);
-  cursor: pointer; /* Transición para suavizar los cambios */
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
 #avatar:hover {
+  /* REFACTOR: Fixed undefined var. Now uses defined colors for inversion. */
   border: 1px solid var(--color-accent);
-  background-color: var(--color-accent-light); /* Un azul más claro */
+  background-color: var(--color-light);
   color: var(--color-accent);
   cursor: pointer;
 }
@@ -120,15 +109,15 @@ header {
   font-size: 0.8rem;
 }
 
-/* Contenedor del avatar y el menú para posicionar el dropdown */
+/* Container for avatar and menu to position the dropdown */
 #user-menu-container {
   position: relative;
 }
 
-/* Estilo del menú desplegable */
+/* Dropdown menu style */
 #user-dropdown {
   position: absolute;
-  top: 100%; /* Posiciona debajo del avatar */
+  top: 100%; /* Positions below the avatar */
   right: 0;
   z-index: 1000;
   min-width: 150px;
@@ -140,7 +129,7 @@ header {
   margin-top: 0.5rem;
 }
 
-/* Clases para mostrar/ocultar */
+/* Classes for showing/hiding */
 .hidden {
   display: none;
 }
@@ -149,7 +138,7 @@ header {
   display: block;
 }
 
-/* Estilo del nombre de usuario dentro del dropdown */
+/* Username style inside dropdown */
 #username-display {
   padding: 0.5rem 1rem;
   font-weight: 600;
@@ -158,7 +147,7 @@ header {
   margin-bottom: 0.5rem;
 }
 
-/* Estilo del enlace de Log out */
+/* Log out link style */
 .dropdown-link {
   cursor: pointer;
   padding: 0.5rem 1rem;
@@ -187,16 +176,9 @@ footer {
   font-size: 0.85em;
 }
 
-/* Estilo para los párrafos dentro del footer */
 .app-footer p {
   margin: 2px 0;
   line-height: 1.2;
-}
-
-/* Estilo para el texto de la cuenta de tareas */
-.task-count-info {
-  font-weight: 800;
-  color: var(--color-accent);
 }
 
 /* =============== */
@@ -217,17 +199,7 @@ footer {
     align-items: flex-end;
   }
 
-  #header-left {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-  }
-
   header h1 {
     font-size: 2.2rem;
-  }
-
-  .container {
-    grid-template-columns: 1fr 1fr;
   }
 }

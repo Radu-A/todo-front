@@ -16,16 +16,18 @@ const newButton = document.getElementById("new-button");
 const filterButtons = [...document.getElementsByClassName("filter-button")];
 
 // --- STATE AND API ---
-// Almacena las tareas cargadas de la API.
+/**
+ * Local cache of all tasks fetched from the server.
+ * @type {Array<Object>}
+ */
 let taskList = [];
-// URL del backend (puertos separados requieren la URL absoluta).
 const API_URL = "https://todo-server-mb4v.onrender.com/api/tasks";
 
 // ==========================
 // 2. COMMON UTILITIES
 // ==========================
 
-/** Formatea e imprime la fecha actual en el encabezado. */
+/** Formats and prints the current date in the header. */
 const printCurrentDate = () => {
   const today = new Date();
   const formatedDate = today.toLocaleDateString("en-EN", {
@@ -36,20 +38,24 @@ const printCurrentDate = () => {
   currentDate.textContent = formatedDate;
 };
 
-/** Restaura las secciones ToDo y Done a su estado inicial. */
+/** Resets the ToDo and Done sections to their initial state. */
 const clearTasks = () => {
   todoContainer.innerHTML = ``;
   doneContainer.innerHTML = ``;
 };
 
-/** Filtra la lista local de tareas por status ('all', 'todo', 'done'). */
+/**
+ * Filters the local taskList based on a status.
+ * @param {string} [filterStatus="all"] - The status to filter by ("all", "todo", or "done").
+ * @returns {Array<Object>} The filtered list of tasks.
+ */
 const filterTasks = (filterStatus = "all") => {
   return filterStatus === "all"
     ? taskList
     : taskList.filter((task) => task.status == filterStatus);
 };
 
-/** Actualiza el contador de tareas pendientes y completadas. */
+/** Updates the pending and completed task counters. */
 const printCounters = () => {
   const todoCounter = document.getElementById("todo-counter");
   const doneCounter = document.getElementById("done-counter");
@@ -61,28 +67,36 @@ const printCounters = () => {
   ).length;
 };
 
-/** Resalta el botón de filtro activo. */
+/** Highlights the active filter button. */
 const activateFilterButton = (clickedButton) => {
   filterButtons.forEach((button) => {
     button.classList.toggle("filter-active", button === clickedButton);
   });
 };
 
+/**
+ * Retrieves the JWT from localStorage.
+ * If not found, redirects the user to the login page.
+ * @returns {string|null} The JWT, or null if redirected.
+ */
 const getToken = () => {
   const token = localStorage.getItem("userToken");
 
   if (!token) {
-    console.error("No hay token de sesión. Redirigiendo a login");
+    console.error("No session token found. Redirecting to login.");
     const baseUrl = `${window.location.origin}`;
     window.location.href = `${baseUrl}/pages/login.html`;
+    return null; // Stop execution
   }
   return token;
 };
 
+/**
+ * Logs the user out by clearing the token and redirecting to the login page.
+ */
 const handleLogout = () => {
-  console.log("Loggin out user...");
+  console.log("Logging out user...");
   localStorage.removeItem("userToken");
-  // localStorage.removeItem('userName');
   const baseUrl = `${window.location.origin}`;
   window.location.href = `${baseUrl}/pages/login.html`;
 };
@@ -92,10 +106,10 @@ const handleLogout = () => {
 // ==========================
 
 /**
- * Crea y añade un elemento de tarea al DOM.
- * @param {string} _id ID de MongoDB usado como ID del DOM.
- * @param {string} taskName El título de la tarea.
- * @param {string} status El estado ('todo' o 'done').
+ * Creates and adds a task element to the DOM.
+ * @param {string} _id - MongoDB ID used as the DOM ID.
+ * @param {string} taskName - The title of the task.
+ * @param {string} status - The status ('todo' or 'done').
  */
 const printTask = (_id, taskName, status) => {
   let taskArticle = document.createElement("article");
@@ -108,28 +122,34 @@ const printTask = (_id, taskName, status) => {
     </div>
     <button class="delete-button" id="${_id}-delete-button"></button>`;
 
-  // Determina la sección de destino
-  const section = status === "todo" ? todoContainer : doneContainer;
-  section.appendChild(taskArticle);
+  // Determine the target section
+  const container = status === "todo" ? todoContainer : doneContainer;
+  container.appendChild(taskArticle);
 
-  // Activa la animación CSS
+  // Trigger CSS animation
   requestAnimationFrame(() => {
     taskArticle.classList.add("article-show");
   });
 
-  // Asigna eventos
+  // Assign events
   activateDeleteButton(_id, status);
-  asingStatus(taskArticle, _id);
-  asignEditEvent(_id);
+  assignStatus(taskArticle, _id);
+  assignEditEvent(_id);
 };
 
 // ==========================
 // 4. CRUD OPERATIONS (API CALLS)
 // ==========================
 
-/** Carga todas las tareas desde la API (GET). */
+/**
+ * Fetches all tasks from the API, updates the local taskList,
+ * and renders them to the DOM.
+ * @param {string} [filterStatus="all"] - The filter to apply after fetching.
+ */
 const getTasks = async (filterStatus = "all") => {
   const token = getToken();
+  if (!token) return; // Stop if no token
+
   clearTasks();
   try {
     const response = await fetch(API_URL, {
@@ -149,13 +169,18 @@ const getTasks = async (filterStatus = "all") => {
     );
     printCounters();
   } catch (error) {
-    console.error("Fallo en getTasks:", error);
+    console.error("Failed in getTasks:", error);
   }
 };
 
-/** Crea una nueva tarea en la API (POST). */
+/**
+ * Creates a new task in the API and renders it to the DOM.
+ * @param {string} taskName - The title for the new task.
+ */
 const createTask = async (taskName) => {
   const token = getToken();
+  if (!token) return;
+
   const taskData = { title: taskName };
 
   try {
@@ -168,20 +193,26 @@ const createTask = async (taskName) => {
       body: JSON.stringify(taskData),
     });
 
-    if (!response.ok) throw new Error("Fallo en la creación de la tarea.");
+    if (!response.ok) throw new Error("Failed to create task.");
 
     const newTask = await response.json();
-    taskList.push(newTask);
-    printTask(newTask._id, newTask.title, newTask.status);
+    taskList.push(newTask); // Update local state
+    printTask(newTask._id, newTask.title, newTask.status); // Render
     printCounters();
   } catch (error) {
-    console.error("Fallo en createTask:", error);
+    console.error("Failed in createTask:", error);
   }
 };
 
-/** Elimina una tarea de la API y el DOM (DELETE). */
+/**
+ * Deletes a task from the API and triggers its removal from the DOM.
+ * @param {string} _id - The ID of the task to delete.
+ * @param {string} status - The current status (used to find the DOM element).
+ */
 const deleteTask = async (_id, status) => {
   const token = getToken();
+  if (!token) return;
+
   try {
     const response = await fetch(`${API_URL}/${_id}`, {
       method: "DELETE",
@@ -191,24 +222,27 @@ const deleteTask = async (_id, status) => {
       },
     });
 
-    if (!response.ok) throw new Error("Fallo al eliminar la tarea.");
+    if (!response.ok) throw new Error("Failed to delete task.");
 
-    // Actualiza la lista local y el DOM
+    // Update local list
     taskList = taskList.filter((task) => task._id !== _id);
+    // Trigger DOM removal (with animation)
     deleteFromDocument(_id, status);
   } catch (error) {
-    console.error("Fallo en deleteTask:", error);
+    console.error("Failed in deleteTask:", error);
   }
 };
 
 /**
- * Actualiza el título o el status de la tarea en la API (PATCH).
- * @param {string} _id ID de la tarea a actualizar.
- * @param {object} updateData Objeto con los campos a modificar ({title} o {status}).
- * @returns {boolean} True si la actualización fue exitosa.
+ * Updates the task's title or status in the API (PATCH).
+ * @param {string} _id - ID of the task to update.
+ * @param {Object} updateData - Object with fields to modify (e.g., {title} or {status}).
+ * @returns {Promise<boolean>} True if the update was successful.
  */
 const updateTaskInApi = async (_id, updateData) => {
   const token = getToken();
+  if (!token) return false;
+
   try {
     const response = await fetch(`${API_URL}/${_id}`, {
       method: "PATCH",
@@ -220,12 +254,10 @@ const updateTaskInApi = async (_id, updateData) => {
     });
 
     if (!response.ok)
-      throw new Error(
-        `Fallo al actualizar en el servidor: ${response.statusText}`
-      );
+      throw new Error(`Failed to update on server: ${response.statusText}`);
     return true;
   } catch (error) {
-    console.error("Error en updateTaskInApi:", error);
+    console.error("Error in updateTaskInApi:", error);
     return false;
   }
 };
@@ -233,33 +265,44 @@ const updateTaskInApi = async (_id, updateData) => {
 // ==========================
 // 5. SHOW USER NAME
 // ==========================
-// Decode payload form JWT
+
+/**
+ * Decodes a JWT payload from its Base64Url string.
+ * @param {string} token - The JWT.
+ * @returns {Object|null} The decoded payload object, or null on error.
+ */
 const decodeJwt = (token) => {
   try {
     const parts = token.split(".");
     const payload = parts[1];
-    // 1. Reemplazar caracteres no seguros para URL (esto se hace a veces con JWT)
+    // 1. Replace URL-unsafe characters
     const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
 
-    // 2. Usar atob() para decodificar la Base64 a una cadena binaria
+    // 2. Use atob() to decode Base64 to a binary string
     const raw = atob(base64);
 
-    // 3. Forzar la interpretación de la cadena binaria como UTF-8
-    //    Usamos decodeURIComponent() y escape() para manejar correctamente los caracteres multibyte (UTF-8).
+    // 3. Force interpretation as UTF-8
     const decodedPayload = decodeURIComponent(escape(raw));
 
     return JSON.parse(decodedPayload);
   } catch (error) {
-    console.error("Error al decodificar el token: ", e);
+    console.error("Error decoding token: ", error);
     return null;
   }
 };
 
+/**
+ * Gets user data from the JWT and displays it in the header.
+ */
 const getUserData = () => {
   const token = getToken();
-  const username = decodeJwt(token).username;
-  const initial = decodeJwt(token).username[0].toUpperCase();
-  console.log(initial);
+  if (!token) return;
+
+  const payload = decodeJwt(token);
+  if (!payload) return;
+
+  const username = payload.username;
+  const initial = username[0].toUpperCase();
 
   avatar.textContent = initial;
   usernameDisplay.textContent = `${username}`;
@@ -268,24 +311,18 @@ const getUserData = () => {
 getUserData();
 
 // ==========================
-// 5. REORDERING LOGIC
+// 6. REORDERING LOGIC
 // ==========================
+
 /**
- * Maneja el reordenamiento de tareas en el DOM y en la lista local.
- * **Esta función debe ser completada con la llamada a la API de reordenamiento.**
- * @param {string} _id ID de la tarea arrastrada.
- * @param {number} newIndex La nueva posición de la tarea.
- * @param {number} oldIndex La posición original de la tarea.
- */
-/**
- * Maneja el reordenamiento de tareas en el DOM y en la lista local.
- * Llama a la API para persistir el nuevo orden.
- * @param {string} _id ID de la tarea arrastrada.
- * @param {number} newIndex La nueva posición de la tarea.
- * @param {number} oldIndex La posición original de la tarea.
+ * Handles task reordering in the DOM and local list.
+ * Calls the API to persist the new order.
+ * @param {string} _id - ID of the dragged task.
+ * @param {number} newIndex - The new position of the task.
+ * @param {number} oldIndex - The original position of the task.
  */
 const handleTaskReorder = async (_id, newIndex, oldIndex) => {
-  // 1. Encontrar la tarea movida en la lista local
+  // 1. Find the moved task in the local list
   const taskToMove = taskList.find((task) => task._id === _id);
   if (!taskToMove) {
     console.error("Task not found in local list.");
@@ -293,26 +330,28 @@ const handleTaskReorder = async (_id, newIndex, oldIndex) => {
   }
   const status = taskToMove.status; // 'todo' or 'done'
 
-  // 2. Actualización OPTIMISTA del estado local (actualiza el DOM visualmente)
-  // Filtra la lista por el status correcto
+  // 2. Optimistic update of local state
+  // Filter the list by the correct status
   const currentStatusList = taskList
     .filter((task) => task.status === status)
-    .sort((a, b) => a.position - b.position); // Asegura el orden correcto
+    .sort((a, b) => a.position - b.position); // Ensure correct order
 
-  // Mueve el elemento en esta lista filtrada
+  // Move the item in this filtered list
   const [movedItem] = currentStatusList.splice(oldIndex, 1);
   currentStatusList.splice(newIndex, 0, movedItem);
 
-  // 3. Re-asignar la propiedad 'position' en la lista local 'taskList'
-  // Esto es VITAL para que los siguientes "drag and drop" tengan el 'oldIndex' correcto.
+  // 3. Re-assign the 'position' property in the global 'taskList'
+  // This is VITAL so that subsequent drag-and-drops have the correct 'oldIndex'.
   currentStatusList.forEach((task, index) => {
     const globalTask = taskList.find((t) => t._id === task._id);
     if (globalTask) globalTask.position = index;
   });
 
-  // 4. Llamar a la API para guardar el cambio en el backend
+  // 4. Call the API to save the change in the backend
   try {
     const token = getToken();
+    if (!token) return;
+
     const response = await fetch(`${API_URL}/${_id}/reorder`, {
       method: "PATCH",
       headers: {
@@ -320,8 +359,8 @@ const handleTaskReorder = async (_id, newIndex, oldIndex) => {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        oldPosition: oldIndex, // El 'oldIndex' de Sortable.js
-        newPosition: newIndex, // El 'newIndex' de Sortable.js
+        oldPosition: oldIndex, // The 'oldIndex' from Sortable.js
+        newPosition: newIndex, // The 'newIndex' from Sortable.js
         status: status,
       }),
     });
@@ -330,24 +369,31 @@ const handleTaskReorder = async (_id, newIndex, oldIndex) => {
       throw new Error("Failed to save reorder to server.");
     }
 
-    console.log(`Tarea ${_id} movida de ${oldIndex} a ${newIndex} y guardada.`);
+    console.log(`Task ${_id} moved from ${oldIndex} to ${newIndex} and saved.`);
   } catch (error) {
     console.error("Error saving reorder:", error);
-    // Si la API falla, el DOM está desincronizado con la DB.
-    // Forzamos una recarga para volver al estado real de la DB.
-    alert("Error al guardar el orden. Recargando la lista.");
+    // If the API fails, the DOM is out of sync with the DB.
+    // Force a reload to return to the DB's true state.
+    alert("Error saving the new order. Reloading the list.");
     const currentFilter =
       document.querySelector(".filter-active").dataset.filter;
-    getTasks(currentFilter); // Recargar
+    getTasks(currentFilter); // Reload
   }
 };
 
 // ==========================
-// 6. EVENT HANDLERS AND DOM LOGIC
+// 7. EVENT HANDLERS AND DOM LOGIC
 // ==========================
 
-/** Maneja el cambio de status (todo <-> done) y la animación de movimiento. */
-const asingStatus = (taskArticle, _id) => {
+/**
+ * Assigns the click handler for changing a task's status (todo <-> done).
+ * This handles the API call, local state update, and DOM manipulation
+ * (moving the element between containers with animation).
+ *
+ * @param {HTMLElement} taskArticle - The <article> element for the task.
+ *ax @param {string} _id - The task's MongoDB ID.
+ */
+const assignStatus = (taskArticle, _id) => {
   const statusIcon = document.getElementById(`${_id}-icon`);
 
   statusIcon.addEventListener("click", async (event) => {
@@ -355,23 +401,34 @@ const asingStatus = (taskArticle, _id) => {
 
     const oldStatus = statusIcon.classList.contains("todo") ? "todo" : "done";
     const newStatus = oldStatus === "todo" ? "done" : "todo";
+
+    // Wait for the backend update to be successful before changing the UI
     const updateSuccessful = await updateTaskInApi(_id, { status: newStatus });
 
     if (updateSuccessful) {
-      // 1. Actualiza la lista local
+      // 1. Update the local state (taskList array) to match the change
       const taskIndex = taskList.findIndex((task) => task._id === _id);
       if (taskIndex !== -1) taskList[taskIndex].status = newStatus;
 
-      // 2. Realiza la animación y el movimiento del DOM
-      taskArticle.classList.remove("article-show");
+      // 2. Perform the visual DOM manipulation
+      taskArticle.classList.remove("article-show"); // Start fade-out
       statusIcon.classList.replace(oldStatus, newStatus);
 
-      const oldSection = oldStatus === "todo" ? todoContainer : doneContainer;
-      const newSection = newStatus === "todo" ? todoContainer : doneContainer;
+      const oldContainer = oldStatus === "todo" ? todoContainer : doneContainer;
+      const newContainer = newStatus === "todo" ? todoContainer : doneContainer;
 
-      oldSection.removeChild(taskArticle);
-      newSection.appendChild(taskArticle);
+      oldContainer.removeChild(taskArticle);
 
+      // --- Key Insertion Logic ---
+      if (newStatus === "done") {
+        // Add to the TOP of the "Done" list (LIFO - Last In, First Out)
+        newContainer.prepend(taskArticle);
+      } else {
+        // Add to the BOTTOM of the "ToDo" list (FIFO - First In, First Out)
+        newContainer.appendChild(taskArticle);
+      }
+
+      // Trigger the fade-in animation in the new location
       requestAnimationFrame(() => {
         taskArticle.classList.add("article-show");
       });
@@ -381,7 +438,7 @@ const asingStatus = (taskArticle, _id) => {
   });
 };
 
-/** Asigna el evento de click al botón de eliminar. */
+/** Assigns the click event to the delete button. */
 const activateDeleteButton = (_id, status) => {
   const deleteButton = document.getElementById(`${_id}-delete-button`);
   if (deleteButton) {
@@ -392,23 +449,27 @@ const activateDeleteButton = (_id, status) => {
         event.preventDefault();
         deleteTask(_id, status);
       },
-      { once: true }
-    ); // Usamos once: true para asegurar que el listener se elimina tras el click
+      { once: true } // Use { once: true } to auto-remove the listener after click
+    );
   }
 };
 
-/** Maneja la animación de eliminación y remueve el elemento del DOM. */
+/**
+ * Handles the delete animation and removes the element from the DOM.
+ * @param {string} _id - The ID of the task to remove.
+ * @param {string} status - The status, used to find the correct parent container.
+ */
 const deleteFromDocument = (_id, status) => {
   const taskArticle = document.getElementById(`${_id}`);
   taskArticle.classList.remove("article-show");
-  taskArticle.classList.add("article-unshow");
+  taskArticle.classList.add("article-unshow"); // Triggers fade-out animation
 
   taskArticle.addEventListener(
     "animationend",
     () => {
       const section = status === "todo" ? todoContainer : doneContainer;
       if (section.contains(taskArticle)) {
-        // Verificación extra antes de remover
+        // Extra check before removing
         section.removeChild(taskArticle);
       }
       printCounters();
@@ -419,12 +480,15 @@ const deleteFromDocument = (_id, status) => {
 
 // --- Edit Title Logic ---
 
-/** Asigna el evento click (para iniciar edición) al H3. */
-const asignEditEvent = (_id) => {
+/**
+ * Assigns the click event (to start editing) to the task's H3 title.
+ * @param {string} _id - The task's ID.
+ */
+const assignEditEvent = (_id) => {
   const taskNameH3 = document.getElementById(`${_id}-task-name`);
 
-  // Usamos { once: true } para que el listener se auto-destruya después del click
-  // Esto es clave para evitar conflictos cuando el H3 se reinserta en el DOM.
+  // Use { once: true } so the listener self-destructs after one click.
+  // This is key to avoiding conflicts when the H3 is re-inserted.
   taskNameH3.addEventListener(
     "click",
     (event) => {
@@ -435,7 +499,11 @@ const asignEditEvent = (_id) => {
   );
 };
 
-/** Reemplaza el H3 con el input de edición. */
+/**
+ * Replaces the H3 title with an <input> field to allow editing.
+ * @param {HTMLElement} taskNameH3 - The <h3> element that was clicked.
+ * @param {string} _id - The task's ID.
+ */
 const createEditInput = (taskNameH3, _id) => {
   const taskHeader = document.getElementById(`${_id}-task-header`);
   const editInput = document.createElement("input");
@@ -445,23 +513,23 @@ const createEditInput = (taskNameH3, _id) => {
   editInput.value = taskNameH3.textContent;
   editInput.focus();
 
-  // Asignamos eventos de guardado/cancelación
-  asignKeydownEvent(taskHeader, taskNameH3, editInput, _id);
-  asignBlurEvent(taskHeader, taskNameH3, editInput, _id);
+  // Assign save/cancel events
+  assignKeydownEvent(taskHeader, taskNameH3, editInput, _id);
+  assignBlurEvent(taskHeader, taskNameH3, editInput, _id);
 };
 
-/** Maneja Enter (guardar) y Escape (cancelar) en el input. */
-const asignKeydownEvent = (taskHeader, taskNameH3, editInput, _id) => {
+/** Handles Enter (save) and Escape (cancel) on the input. */
+const assignKeydownEvent = (taskHeader, taskNameH3, editInput, _id) => {
   editInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       if (editInput.value.trim()) {
         updateTaskName(_id, taskHeader, taskNameH3, editInput);
       }
     } else if (event.key === "Escape") {
-      // Reemplaza input por H3 si se presiona Escape
+      // Replaces input with H3 if Escape is pressed
       try {
         taskHeader.replaceChild(taskNameH3, editInput);
-        asignEditEvent(_id); // Reasigna el listener de click al H3
+        assignEditEvent(_id); // Re-assign the click listener to the H3
       } catch (e) {
         /* ignore if already gone */
       }
@@ -469,16 +537,16 @@ const asignKeydownEvent = (taskHeader, taskNameH3, editInput, _id) => {
   });
 };
 
-/** Maneja la pérdida de foco (blur) para guardar o revertir. */
-const asignBlurEvent = (taskHeader, taskNameH3, editInput, _id) => {
+/** Handles the loss of focus (blur) to save or revert. */
+const assignBlurEvent = (taskHeader, taskNameH3, editInput, _id) => {
   editInput.addEventListener("blur", () => {
     if (editInput.value.trim()) {
       updateTaskName(_id, taskHeader, taskNameH3, editInput);
     } else {
-      // Si está vacío, revierte al H3 original
+      // If it's empty, revert to the original H3
       try {
         taskHeader.replaceChild(taskNameH3, editInput);
-        asignEditEvent(_id); // Reasigna el listener de click al H3
+        assignEditEvent(_id); // Re-assign the click listener to the H3
       } catch (e) {
         /* ignore if already gone */
       }
@@ -486,78 +554,83 @@ const asignBlurEvent = (taskHeader, taskNameH3, editInput, _id) => {
   });
 };
 
-/** Actualiza el título en la API y restaura el H3 en el DOM. */
+/**
+ * Updates the title in the API and restores the H3 in the DOM.
+ * @param {string} _id
+ * @param {HTMLElement} taskHeader
+ * @param {HTMLElement} taskNameH3
+ * @param {HTMLElement} editInput
+ */
 const updateTaskName = async (_id, taskHeader, taskNameH3, editInput) => {
   const newTaskName = editInput.value.trim();
   const titleChanged = taskNameH3.textContent !== newTaskName;
 
-  // 1. Si no ha cambiado, o está vacío, restauramos el DOM y salimos.
+  // 1. If it hasn't changed, or is empty, restore the DOM and exit.
   if (!titleChanged) {
     try {
       taskHeader.replaceChild(taskNameH3, editInput);
-      asignEditEvent(_id);
+      assignEditEvent(_id);
     } catch (e) {
       /* ignore */
     }
     return;
   }
 
-  // 2. Llamada a la API para guardar el nuevo título
+  // 2. API call to save the new title
   const updateSuccessful = await updateTaskInApi(_id, { title: newTaskName });
 
-  // 3. Restauración del DOM y actualización local
+  // 3. DOM restoration and local update
   try {
-    // Restauramos el H3 SÓLO si el input aún es un hijo.
+    // Restore the H3 ONLY if the input is still a child.
     taskHeader.replaceChild(taskNameH3, editInput);
   } catch (e) {
-    /* ignore error si el blur ya lo hizo */
+    /* ignore error if blur already did this */
   }
 
   if (updateSuccessful) {
-    // Actualizamos el H3 visible y la lista local si la API tuvo éxito.
+    // Update the visible H3 and local list if the API was successful.
     taskNameH3.textContent = newTaskName;
     const taskIndex = taskList.findIndex((task) => task._id === _id);
     if (taskIndex !== -1) taskList[taskIndex].title = newTaskName;
   }
 
-  // 4. Reasignamos el listener de click al H3 (siempre, para evitar el error NotFound)
-  asignEditEvent(_id);
+  // 4. Re-assign the click listener to the H3 (always)
+  assignEditEvent(_id);
 };
 
 // ==========================
-// 7. EVENT LISTENERS SETUP
+// 8. EVENT LISTENERS SETUP
 // ==========================
 
-// Listener para mostrar/ocultar el user-dropdown al hacer click en el avatar
+// Listener to show/hide the user-dropdown when clicking the avatar
 avatar.addEventListener("click", () => {
   userDropdown.classList.toggle("hidden");
 });
 
-// Listener para cerrar sesión desde el dropdown
+// Listener to log out from the dropdown
 dropdownLogoutButton.addEventListener("click", (event) => {
   event.preventDefault();
   handleLogout();
 });
 
-// Listener para cerrar el user-dropdown al pinchar fuera de él
+// Listener to close the user-dropdown when clicking outside of it
 document.addEventListener("click", (event) => {
-  // 1. Obtener el contenedor principal del menú
+  // 1. Get the main menu container
   const menuContainer = document.getElementById("user-menu-container");
 
-  // 2. Comprobar si el menú está visible. Si no lo está, no hacemos nada.
+  // 2. Check if the menu is visible. If not, do nothing.
   if (userDropdown.classList.contains("hidden")) {
     return;
   }
 
-  // 3. Comprobar si el clic ocurrió FUERA del contenedor del menú (avatar incluido)
-  //    .contains(event.target) comprueba si el elemento clicado (event.target) es un descendiente de menuContainer.
+  // 3. Check if the click happened OUTSIDE the menu container
   if (!menuContainer.contains(event.target)) {
-    // El clic fue fuera -> ocultar el menú
+    // The click was outside -> hide the menu
     userDropdown.classList.add("hidden");
   }
 });
 
-// Listener para añadir tarea con Enter en el input.
+// Listener to add task with Enter in the input.
 newInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter" && newInput.value.trim()) {
     createTask(newInput.value.trim());
@@ -565,7 +638,7 @@ newInput.addEventListener("keydown", (event) => {
   }
 });
 
-// Listener para añadir tarea con el botón "Add".
+// Listener to add task with the "Add" button.
 newButton.addEventListener("click", (event) => {
   event.preventDefault();
   if (newInput.value.trim()) {
@@ -574,46 +647,46 @@ newButton.addEventListener("click", (event) => {
   }
 });
 
-// Listeners para los botones de filtro.
+// Listeners for filter buttons.
 filterButtons.forEach((button) => {
   button.addEventListener("click", (event) => {
     event.preventDefault();
-    getTasks(button.dataset.filter); // Carga y filtra
-    activateFilterButton(button); // Activa el botón
+    getTasks(button.dataset.filter); // Load and filter
+    activateFilterButton(button); // Activate button
   });
 });
 
 // ==========================
-// 8. APPLICATION START
+// 9. APPLICATION START
 // ==========================
 
 printCurrentDate();
 getTasks();
 
 // ==========================
-// 9. INITIALIZATION SORTABLE
+// 10. INITIALIZATION SORTABLE
 // ==========================
 
-/** Inicializa Sortable para la lista 'ToDo' */
+/** Initializes Sortable for the 'ToDo' list */
 new Sortable(todoContainer, {
-  group: "todoGroup", // Esencial para evitar mover elementos a 'doneGroup'
+  group: "todoGroup", // Essential to prevent moving items to 'doneGroup'
   animation: 150,
-  ghostClass: "sortable-ghost", // Clase CSS para el elemento 'fantasma' (placeholder)
+  ghostClass: "sortable-ghost", // CSS class for the placeholder ghost
   filter: ".section-header",
   onEnd: function (evt) {
-    // Lógica para actualizar el orden en el backend
+    // Logic to update the order in the backend
     handleTaskReorder(evt.item.id, evt.newIndex, evt.oldIndex);
   },
 });
 
-/** Inicializa Sortable para la lista 'Done' */
+/** Initializes Sortable for the 'Done' list */
 new Sortable(doneContainer, {
-  group: "doneGroup", // Esencial para evitar mover elementos a 'todoGroup'
+  group: "doneGroup", // Essential to prevent moving items to 'todoGroup'
   animation: 150,
   ghostClass: "sortable-ghost",
   filter: ".section-header",
   onEnd: function (evt) {
-    // Lógica para actualizar el orden en el backend
+    // Logic to update the order in the backend
     handleTaskReorder(evt.item.id, evt.newIndex, evt.oldIndex);
   },
 });

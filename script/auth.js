@@ -6,75 +6,107 @@ const emailAuthInput = document.getElementById("email-auth-input");
 const passwordAuthInput = document.getElementById("password-auth-input");
 const repeatAuthInput = document.getElementById("repeat-auth-input");
 const nameAuthInput = document.getElementById("name-auth-input");
-// Referencia al botón de envío
 const authButton = document.getElementById("auth-button");
 const loginForm = document.getElementById("login-form");
 const registerForm = document.getElementById("register-form");
 
 // ==================
-// NAME VALIDATION (SINCRONA)
+// VALIDATION HELPERS (Refactored)
+// ==================
+
+/**
+ * Displays a validation error message after a specific input element.
+ * @param {HTMLElement} inputElement - The input field to show the error under.
+ * @param {string} message - The error message text.
+ * @param {string} messageId - The unique ID for the error message element.
+ */
+const showValidationError = (inputElement, message, messageId) => {
+  // Clear any existing message for this specific validation
+  clearValidationError(messageId);
+
+  const errorMessage = document.createElement("p");
+  errorMessage.className = "validation-message";
+  errorMessage.id = messageId;
+  errorMessage.textContent = message;
+  inputElement.after(errorMessage);
+};
+
+/**
+ * Clears a specific validation error message by its ID.
+ * @param {string} messageId - The ID of the error message element to remove.
+ */
+const clearValidationError = (messageId) => {
+  const existingMessage = document.getElementById(messageId);
+  if (existingMessage) {
+    existingMessage.remove();
+  }
+};
+
+// ==================
+// NAME VALIDATION (SYNC)
 // ==================
 const checkName = (name) => {
-  // Regex: Mínimo 3 caracteres, solo letras, opcionalmente acentos y ñ/Ñ
+  // Regex: Min 3 chars, letters only, accents/ñ allowed.
   const regEx = /^[\p{L}\s]{3,20}$/u;
   return regEx.test(name);
 };
 
+/**
+ * Validates the name input field. Displays an error if invalid.
+ * @returns {boolean} True if valid, false if invalid.
+ */
 const nameValidation = () => {
-  const usedNameMessage = document.getElementById("name-validation-message");
-  if (usedNameMessage) {
-    usedNameMessage.remove();
-  }
-  const nameMessage = document.createElement("p");
-  nameMessage.className = "validation-message";
-  nameMessage.id = "name-validation-message";
-  nameMessage.textContent =
-    "El nombre debe poseer entre 3 y 20 caracteres y solo puede contener letras.";
+  clearValidationError("name-validation-message");
   const name = nameAuthInput.value.trim();
-  console.log(name);
+
   if (!name || !checkName(name)) {
-    nameAuthInput.after(nameMessage);
+    showValidationError(
+      nameAuthInput,
+      "Name must be 3-20 characters and contain only letters.",
+      "name-validation-message"
+    );
     return false;
   }
   return true;
 };
 
 // ==================
-// EMAIL VALIDATION (ASÍNCRONA)
+// EMAIL VALIDATION (ASYNC)
 // ==================
 const checkEmail = (email) => {
-  // Regex para email (robusta)
+  // Robust email regex
   const regEx = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-  return regEx.test(email); // Usar .test() devuelve true/false
+  return regEx.test(email);
 };
 
+/**
+ * Validates the email input field. Checks format (sync) and existence (async).
+ * @returns {Promise<boolean>} True if valid and available, false otherwise.
+ */
 const emailValidation = async () => {
-  // <--- MODIFICADO: FUNCIÓN ASÍNCRONA
-  const usedEmailMessage = document.getElementById("email-validation-message");
-  if (usedEmailMessage) {
-    usedEmailMessage.remove();
+  clearValidationError("email-validation-message");
+  const email = emailAuthInput.value.trim();
+
+  // 1. Format validation (Sync)
+  if (!email || !checkEmail(email)) {
+    showValidationError(
+      emailAuthInput,
+      "The email account is not valid.",
+      "email-validation-message"
+    );
+    return false;
   }
 
-  const email = emailAuthInput.value.trim(); // 1. Validación de formato (Síncrona)
-  if (!email || !checkEmail(email)) {
-    const emailMessage = document.createElement("p");
-    emailMessage.className = "validation-message";
-    emailMessage.id = "email-validation-message";
-    emailMessage.textContent = "La cuenta de correo no es válida";
-    emailAuthInput.after(emailMessage);
-    return false;
-  } // 2. Validación de existencia (Asíncrona) - Solo relevante para REGISTRO
-
+  // 2. Existence check (Async) - Only on registration page
   if (registerForm) {
-    // Usamos await para esperar el resultado de la llamada de red
-    const emailExists = await searchEmail(email); // <--- MODIFICADO: USO DE AWAIT
+    const emailExists = await searchEmail(email);
 
     if (emailExists === true) {
-      const emailMessage = document.createElement("p");
-      emailMessage.className = "validation-message";
-      emailMessage.id = "email-validation-message";
-      emailMessage.textContent = "Esta dirección de correo ya existe";
-      emailAuthInput.after(emailMessage);
+      showValidationError(
+        emailAuthInput,
+        "This email address is already registered.",
+        "email-validation-message"
+      );
       return false;
     }
   }
@@ -82,77 +114,75 @@ const emailValidation = async () => {
 };
 
 // ==================
-// PASSWORD VALIDATION (SINCRONA)
+// PASSWORD VALIDATION (SYNC)
 // ==================
 const checkPassword = (password) => {
-  // Regex: Mín 8 chars, sin espacios, 1 minúscula, 1 número, 1 especial
+  // Regex: Min 8 chars, no spaces, 1 lowercase, 1 number, 1 special char.
   const regEx = /^(?!.*\s)(?=.*[a-z])(?=.*\d)(?=.*[^\w\s])[\S]{8,}$/;
-  return regEx.test(password); // Usar .test() devuelve true/false
+  return regEx.test(password);
 };
 
+/**
+ * Validates the password input field based on regex. Displays an error if invalid.
+ * @returns {boolean} True if valid, false if invalid.
+ */
 const passwordValidation = () => {
-  const usedPasswordMessage = document.getElementById(
-    "password-validation-message"
-  );
-  if (usedPasswordMessage) {
-    usedPasswordMessage.remove();
-  }
-  const passwordMessage = document.createElement("p");
-  passwordMessage.className = "validation-message";
-  passwordMessage.id = "password-validation-message";
-  passwordMessage.textContent =
-    "La contraseña debe tener al menos 8 caracteres, y contener una minúscula, un número y un caracter especial";
+  clearValidationError("password-validation-message");
   const password = passwordAuthInput.value;
+
   if (!password || !checkPassword(password)) {
-    passwordAuthInput.after(passwordMessage);
+    showValidationError(
+      passwordAuthInput,
+      "Password must be at least 8 characters, with one lowercase, one number, and one special character.",
+      "password-validation-message"
+    );
     return false;
   }
   return true;
 };
 
 // ==================
-// REPEAT PASSWORD VALIDATION (SINCRONA)
+// REPEAT PASSWORD VALIDATION (SYNC)
 // ==================
+/**
+ * Validates if the repeated password matches the original password.
+ * @returns {boolean} True if matching, false otherwise.
+ */
 const repeatPasswordValidation = () => {
-  const usedPasswordMessage = document.getElementById(
-    "repeat-validation-message"
-  );
-  if (usedPasswordMessage) {
-    usedPasswordMessage.remove();
-  }
-  const repeatPasswordMessage = document.createElement("p");
-  repeatPasswordMessage.className = "validation-message";
-  repeatPasswordMessage.id = "repeat-validation-message";
-  repeatPasswordMessage.textContent = "La contraseñas no coinciden";
+  clearValidationError("repeat-validation-message");
   const password = passwordAuthInput.value;
   const repeatPassword = repeatAuthInput.value;
+
   if (password != repeatPassword) {
-    repeatAuthInput.after(repeatPasswordMessage);
+    showValidationError(
+      repeatAuthInput,
+      "Passwords do not match.",
+      "repeat-validation-message"
+    );
     return false;
   }
   return true;
 };
 
 // ==================
-// FORM SUBMISSION VALIDATION (ASÍNCRONA)
+// FORM SUBMISSION VALIDATION (ASYNC)
 // ==================
 
 /**
- * Ejecuta todas las validaciones de campos y verifica si todas son válidas.
- * @returns {Promise<boolean>} True si todos los campos son válidos, False si hay errores.
+ * Runs all field validations and checks if all are valid.
+ * @returns {Promise<boolean>} True if all fields are valid, False if there are errors.
  */
 const formValidation = async () => {
-  // <--- MODIFICADO: FUNCIÓN ASÍNCRONA
-  // Las validaciones síncronas se ejecutan primero
+  // Run sync validations first
   const isNameValid = registerForm ? nameValidation() : true;
   const isPasswordValid = passwordValidation();
-  const isRepeatValid = registerForm ? repeatPasswordValidation() : true; // Agregado check de repetición
+  const isRepeatValid = registerForm ? repeatPasswordValidation() : true;
 
-  // La validación del email es ASÍNCRONA y debe ser esperada
-  const isEmailValid = await emailValidation(); // <--- MODIFICADO: USO DE AWAIT
+  // The email validation is ASYNC and must be awaited
+  const isEmailValid = await emailValidation();
 
   if (registerForm) {
-    return isNameValid && isEmailValid && isPasswordValid && isRepeatValid; // Uso de isRepeatValid
+    return isNameValid && isEmailValid && isPasswordValid && isRepeatValid;
   }
   if (loginForm) {
     return isEmailValid && isPasswordValid;
@@ -160,48 +190,58 @@ const formValidation = async () => {
 };
 
 // ==================
-// LOGIN (ASÍNCRONA)
+// LOGIN (ASYNC)
 // ==================
-const handleLogin = async (event) => {
-  // Prepare data
+/**
+ * Handles the login form submission.
+ * Sends credentials to the server, saves the token, and redirects on success.
+ * @returns {Promise<void>}
+ */
+const handleLogin = async () => {
   const data = {
     email: emailAuthInput.value,
     password: passwordAuthInput.value,
   };
-
-  console.log("Sending login request to server...");
 
   try {
     const res = await fetch(`${server}/auth`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
-    }); // 2. Manejo de Fallo de Autenticación (401/500)
+    });
 
+    // Handle Auth Failure (401/500)
     if (!res.ok) {
-      const errorData = await res.json(); // Lanza el mensaje del servidor para que el catch lo maneje
+      const errorData = await res.json();
+      // Throw the server's message for the catch block
       throw new Error(errorData.message || `HTTP Error: ${res.status}`);
-    } // 3. ÉXITO (Status 200)
+    }
 
+    // SUCCESS (Status 200)
     const result = await res.json();
-    console.log("Authentication successful. User data:", result.user); // Save token
-    console.log("Token recibido", result.token);
 
-    localStorage.setItem("userToken", result.token); // 4. REDIRECCIÓN AL ÉXITO (Punto 1)
+    // Save token
+    localStorage.setItem("userToken", result.token);
 
+    // REDIRECT ON SUCCESS
     const baseUrl = `${window.location.origin}`;
     window.location.href = `${baseUrl}/index.html`;
   } catch (err) {
-    // 5. MANEJO DEL ERROR y Muestra de Mensaje
-    console.error("Login failed or network error:", err.message); // Muestra el mensaje de error capturado (ej: "Credenciales inválidas")
-
+    // ERROR HANDLING and Message Display
+    // Show the captured error message (e.g., "Invalid credentials")
+    console.error("Login failed or network error:", err.message);
     showLoginError(err.message);
   }
 };
 
+/**
+ * Displays a general error message at the bottom of the login form.
+ * @param {string} message - The error message to display.
+ */
 const showLoginError = (message) => {
   const existingMessage = document.getElementById("login-message");
   if (existingMessage) existingMessage.remove();
+
   const loginMessage = document.createElement("p");
   loginMessage.textContent = message;
   loginMessage.className = "validation-message";
@@ -210,78 +250,88 @@ const showLoginError = (message) => {
 };
 
 // ==================
-// REGISTER (ASÍNCRONA)
+// REGISTER (ASYNC)
 // ==================
-// auth.js (Frontend)
-
+/**
+ * Handles the registration form submission.
+ * Creates a new user, then automatically calls handleLogin() on success.
+ * @returns {Promise<void>}
+ */
 const handleRegister = async () => {
-  // Make the function async
   const data = {
-    username: nameAuthInput.value, // Ensure your input name matches backend (username vs userName)
+    username: nameAuthInput.value,
     email: emailAuthInput.value,
     password: passwordAuthInput.value,
-  }; // Clear previous error messages (assuming you have a way to display them) // clearErrorMessages();
+  };
 
-  console.log("Sending registration request to server...");
-  // Fetch to userController/createUser
   try {
     const response = await fetch(`${server}/user`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
+
     // 1. Check for non-2xx status codes (400, 409, 500)
     if (!response.ok) {
-      const errorData = await response.json(); // Throw the message from the server (e.g., "This email is already registered")
+      const errorData = await response.json();
+      // Throw the message from the server (e.g., "This email is already registered")
       throw new Error(errorData.message || `HTTP Error: ${response.status}`);
     }
+
     // 2. SUCCESS (Status 201)
-    const result = await response.json();
-    console.log("Registration successful:", result.message);
-    // Login and redirect
+    // Registration was successful, now automatically log the user in.
     await handleLogin();
-    const baseUrl = `${window.location.origin}`;
-    window.location.href = `${baseUrl}/index.html`;
+    // The handleLogin() function will handle the successful redirect.
+    // No further action is needed here.
   } catch (error) {
     // 3. Catch and display the error message to the user
-    console.error("Registration failed:", error.message); // showErrorMessage(error.message); // Implement a function to show this message on the page
+    console.error("Registration failed:", error.message);
+    // Here you could call showLoginError() or a similar function for the register form
   }
 };
 
 // ==================
-// SEARCH EMAIL (ASÍNCRONA)
+// SEARCH EMAIL (ASYNC)
 // ==================
+/**
+ * Checks the backend to see if an email address is already registered.
+ * @param {string} email - The email to check.
+ * @returns {Promise<boolean>} True if the email exists, false otherwise.
+ */
 const searchEmail = async (email) => {
   const data = { email: email };
 
   try {
     const response = await fetch(`${server}/user/email`, {
-      // Cambiado el endpoint a uno más descriptivo
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
-    const result = await response.json(); // Si el servidor responde con 500 (DB Error)
+    const result = await response.json();
 
+    // If server responds with 500 (DB Error)
     if (response.status === 500) {
       console.error("Server error during email check:", result.message);
       return false;
-    } // Si el email existe (Status 200 y exists: true)
+    }
 
+    // If email exists (Status 200 and exists: true)
     if (result.exists === true) {
-      console.log("Email exists! Proceed to password input."); // Lógica para mostrar el campo de contraseña, etc.
       return true;
-    } // Si el email NO existe (Status 200 y exists: false)
+    }
+
+    // If email does NOT exist (Status 200 and exists: false)
     return false;
   } catch (error) {
-    console.error("Network or parsing error:", error); // Manejo de errores de red: asumimos que no existe si no podemos confirmar
+    console.error("Network or parsing error:", error);
+    // Network error handling: assume it doesn't exist if we can't confirm
     return false;
   }
 };
 
 // ==================
-// EVENT LISTENERS (ASÍNCRONOS)
+// EVENT LISTENERS (ASYNC)
 // ==================
 
 if (nameAuthInput) {
@@ -290,10 +340,9 @@ if (nameAuthInput) {
   });
 }
 
-// Listener de blur para email
+// Blur listener for email
 emailAuthInput.addEventListener("blur", async () => {
-  // <--- MODIFICADO: ASÍNCRONO
-  await emailValidation(); // <--- MODIFICADO: USO DE AWAIT
+  await emailValidation();
 });
 
 passwordAuthInput.addEventListener("blur", () => {
@@ -306,34 +355,24 @@ if (repeatAuthInput) {
   });
 }
 
-// Listener para el envío del formulario login
+// Form submission listener (login)
 if (loginForm) {
   loginForm.addEventListener("submit", async (event) => {
-    // <--- MODIFICADO: ASÍNCRONO
     event.preventDefault();
 
     if (await formValidation()) {
-      // <--- MODIFICADO: USO DE AWAIT
-      console.log("¡Validación exitosa! Enviando datos al servidor...");
-      handleLogin(event);
-    } else {
-      console.log("Error de validación. Por favor, revisa los campos.");
+      handleLogin();
     }
   });
 }
 
-// Listener para el envío del formulario registro
+// Form submission listener (register)
 if (registerForm) {
   registerForm.addEventListener("submit", async (event) => {
-    // <--- MODIFICADO: ASÍNCRONO
     event.preventDefault();
 
     if (await formValidation()) {
-      // <--- MODIFICADO: USO DE AWAIT
-      console.log("¡Validación exitosa! Enviando datos al servidor...");
-      handleRegister(event);
-    } else {
-      console.log("Error de validación. Por favor, revisa los campos.");
+      handleRegister();
     }
   });
 }

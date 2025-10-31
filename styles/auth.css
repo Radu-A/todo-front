@@ -1,4 +1,4 @@
-/* Importar reglas base */
+/* Import base rules */
 @import url("./base.css");
 
 /* =============== */
@@ -6,8 +6,8 @@
 /* =============== */
 
 /*
-   La configuración de 'main' en base.css (display: grid; align-content: center; justify-content: center;)
-   se encarga de centrar la sección de login vertical y horizontalmente.
+  The 'main' setup in base.css (flex: 1) allows us to center
+  content on this page using flexbox on the main element itself.
 */
 
 .auth-main {
@@ -19,24 +19,25 @@
 }
 
 .auth-section {
-  /* Hace que la caja de login sea distinta, sobrescribiendo el estilo genérico de 'section' */
+  /* Overrides the generic 'section' style from base.css */
   margin-bottom: 1rem;
   padding: 2rem;
   border: 1px solid var(--color-secondary);
   border-radius: 0.5rem;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   background-color: var(--color-light);
-  text-align: center; /* Centra el h1 y el texto del enlace */
-  max-width: 350px; /* Tamaño ligeramente más pequeño para formularios de autenticación */
+  text-align: center;
+  max-width: 350px;
 }
 
 .auth-article {
+  /* Overrides any potential 'article' styles */
   padding: 0;
   border: none;
   height: auto;
 }
 
-/* Elementos del Formulario */
+/* Form Elements */
 
 .auth-form {
   display: flex;
@@ -79,7 +80,7 @@
 }
 
 .auth-button:hover {
-  background-color: #3b7fb3; /* Tono más oscuro de acento */
+  background-color: #3b7fb3; /* Darker shade of accent */
 }
 
 .link-text {
