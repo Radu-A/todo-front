@@ -1,7 +1,8 @@
 // ==================
 // VARIABLES
 // ==================
-const server = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api";
+const server = "http://localhost:5000/api";
+// const server = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api";
 // const server = "https://todo-server-mb4v.onrender.com/api";
 const emailAuthInput = document.getElementById("email-auth-input");
 const passwordAuthInput = document.getElementById("password-auth-input");
@@ -288,6 +289,53 @@ const handleRegister = async () => {
     // 3. Catch and display the error message to the user
     console.error("Registration failed:", error.message);
     // Here you could call showLoginError() or a similar function for the register form
+  }
+};
+
+// ==================
+// GOOGLE AUTH (NUEVO)
+// ==================
+/**
+ * Se llama cuando Google devuelve las credenciales del usuario.
+ * @param {object} response - El objeto de credenciales de Google.
+ */
+const handleGoogleCredentialResponse = (response) => {
+  // 'response.credential' es el token de ID (JWT) de Google
+  const googleToken = response.credential;
+  sendGoogleTokenToBackend(googleToken);
+};
+
+/**
+ * Envía el token de Google al backend para procesarlo.
+ * @param {string} token - El token de ID de Google.
+ */
+const sendGoogleTokenToBackend = async (token) => {
+  try {
+    const res = await fetch(`${server}/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: token }),
+    });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      throw new Error(errorData.message || `HTTP Error: ${res.status}`);
+    }
+
+    // ÉXITO (Status 200)
+    // El backend nos devuelve NUESTRO PROPIO TOKEN JWT
+    const result = await res.json();
+
+    // Guardamos NUESTRO token de servidor
+    localStorage.setItem("userToken", result.token);
+
+    // REDIRIGIMOS (igual que en handleLogin)
+    const baseUrl = `${window.location.origin}`;
+    window.location.href = `${baseUrl}/index.html`;
+  } catch (err) {
+    // Muestra el error (puedes reusar showLoginError)
+    console.error("Google login failed:", err.message);
+    showLoginError(err.message || "Error al iniciar sesión con Google.");
   }
 };
 
