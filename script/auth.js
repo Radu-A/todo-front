@@ -299,27 +299,13 @@ const handleRegister = async () => {
  * Se llama cuando Google devuelve las credenciales del usuario.
  * @param {object} response - El objeto de credenciales de Google.
  */
-// const handleGoogleCredentialResponse = (response) => {
-//   // 'response.credential' es el token de ID (JWT) de Google
-//   const googleToken = response.credential;
-//   sendGoogleTokenToBackend(googleToken);
-// };
+function handleGoogleCredentialResponse(response) {
+  // 'response.credential' es el token de ID (JWT) de Google
+  const googleToken = response.credential;
 
-function handleCredentialResponse(response) {
-  console.log("Encoded JWT ID token: " + response.credential);
+  // Enviar este token a nuestro backend para verificación y inicio de sesión/registro
+  sendGoogleTokenToBackend(googleToken);
 }
-window.onload = function () {
-  google.accounts.id.initialize({
-    client_id:
-      "800527968947-992ughtjj48fg1h2r7l35iqtov2np8nu.apps.googleusercontent.com",
-    callback: handleCredentialResponse,
-  });
-  google.accounts.id.renderButton(
-    document.getElementById("buttonDiv"),
-    { theme: "outline", size: "large" } // customization attributes
-  );
-  google.accounts.id.prompt(); // also display the One Tap dialog
-};
 
 /**
  * Envía el token de Google al backend para procesarlo.
