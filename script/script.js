@@ -21,8 +21,9 @@ const filterButtons = [...document.getElementsByClassName("filter-button")];
  * @type {Array<Object>}
  */
 let taskList = [];
+const API_URL = "/api/tasks";
 // const API_URL = "http://localhost:5000/api/tasks";
-const API_URL = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api/tasks";
+// const API_URL = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api/tasks";
 // const API_URL = "https://todo-server-mb4v.onrender.com/api/tasks";
 
 // ==========================
