@@ -314,7 +314,7 @@ function handleGoogleCredentialResponse(response) {
  */
 const sendGoogleTokenToBackend = async (token) => {
   try {
-    const res = await fetch(`${server}/google`, {
+    const res = await fetch(`${server}/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: token }),
