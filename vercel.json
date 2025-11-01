@@ -1,11 +1,17 @@
 {
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://todo-server-1zx1.onrender.com/api/:path*"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
         {
           "key": "Cross-Origin-Opener-Policy",
-          "value": "unsafe-none"
+          "value": "same-origin-allow-popups"
         }
       ]
     }
