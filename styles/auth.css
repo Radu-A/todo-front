@@ -91,15 +91,16 @@
 
 /* Google auth */
 
-#google-container {
+/* #google-container {
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-}
+} */
 
-#g_id_onload {
+.g_id_signin, #g_id_onload {
+  width: 100%;
   margin-top: 0.3rem;
   font-size: 1.2rem;
 }
