@@ -92,18 +92,13 @@
 /* Google auth */
 
 #google-container {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  margin-top: 0.3rem;
 }
 
-.g_id_signin,
-#g_id_onload {
-  width: 100%;
-  margin-top: 0.3rem;
-  font-size: 1.2rem;
+.S9gUrf-YoZ4jf {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Link message */
