@@ -2,13 +2,14 @@
 // VARIABLES
 // ==================
 // RELATIVE
-// const server = "/api";
+const server = "/api";
 // LOCAL
 // const server = "http://localhost:5000/api";
 // KOYEB
 // const server = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api";
 // RENDER
-const API_URL = "https://todo-server-1zx1.onrender.com/api";
+// const API_URL = "https://todo-server-1zx1.onrender.com/api";
+
 const emailAuthInput = document.getElementById("email-auth-input");
 const passwordAuthInput = document.getElementById("password-auth-input");
 const repeatAuthInput = document.getElementById("repeat-auth-input");
