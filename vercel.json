@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://todo-server-1zx1.onrender.com/api/:path*"
+      "destination": "zealous-odele-radu-a-2bb4e20d.koyeb.app/api/:path*"
     }
   ],
   "headers": [
