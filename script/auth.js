@@ -1,10 +1,14 @@
 // ==================
 // VARIABLES
 // ==================
-const server = "/api";
+// RELATIVE
+// const server = "/api";
+// LOCAL
 // const server = "http://localhost:5000/api";
+// KOYEB
 // const server = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api";
-// const server = "https://todo-server-mb4v.onrender.com/api";
+// RENDER
+const API_URL = "https://todo-server-1zx1.onrender.com";
 const emailAuthInput = document.getElementById("email-auth-input");
 const passwordAuthInput = document.getElementById("password-auth-input");
 const repeatAuthInput = document.getElementById("repeat-auth-input");
@@ -207,7 +211,7 @@ const handleLogin = async () => {
   };
 
   try {
-    const res = await fetch(`${server}/auth`, {
+    const res = await fetch(`${API_URL}/auth`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -268,7 +272,7 @@ const handleRegister = async () => {
   };
 
   try {
-    const response = await fetch(`${server}/user`, {
+    const response = await fetch(`${API_URL}/user`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -314,7 +318,7 @@ function handleGoogleCredentialResponse(response) {
  */
 const sendGoogleTokenToBackend = async (token) => {
   try {
-    const res = await fetch(`${server}/auth/google`, {
+    const res = await fetch(`${API_URL}/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token: token }),
@@ -354,7 +358,7 @@ const searchEmail = async (email) => {
   const data = { email: email };
 
   try {
-    const response = await fetch(`${server}/user/email`, {
+    const response = await fetch(`${API_URL}/user/email`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
