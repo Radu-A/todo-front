@@ -122,6 +122,46 @@ const emailValidation = async () => {
 };
 
 // ==================
+// SEARCH EMAIL (ASYNC)
+// ==================
+/**
+ * Checks the backend to see if an email address is already registered.
+ * @param {string} email - The email to check.
+ * @returns {Promise<boolean>} True if the email exists, false otherwise.
+ */
+const searchEmail = async (email) => {
+  const data = { email: email };
+
+  try {
+    const response = await fetch(`${API_URL}/user/email`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    // If server responds with 500 (DB Error)
+    if (response.status === 500) {
+      console.error("Server error during email check:", result.message);
+      return false;
+    }
+
+    // If email exists (Status 200 and exists: true)
+    if (result.exists === true) {
+      return true;
+    }
+
+    // If email does NOT exist (Status 200 and exists: false)
+    return false;
+  } catch (error) {
+    console.error("Network or parsing error:", error);
+    // Network error handling: assume it doesn't exist if we can't confirm
+    return false;
+  }
+};
+
+// ==================
 // PASSWORD VALIDATION (SYNC)
 // ==================
 const checkPassword = (password) => {
@@ -318,6 +358,10 @@ function handleGoogleCredentialResponse(response) {
  * @param {string} token - El token de ID de Google.
  */
 const sendGoogleTokenToBackend = async (token) => {
+  // 1. INICIA EL ESTADO DE CARGA
+  setAuthFormLoading(true);
+  // Muestra un mensaje (puedes reusar tu función showLoginError para esto)
+  showLoginError("Verificando, por favor espera...");
   try {
     const res = await fetch(`${API_URL}/auth/google`, {
       method: "POST",
@@ -348,42 +392,34 @@ const sendGoogleTokenToBackend = async (token) => {
 };
 
 // ==================
-// SEARCH EMAIL (ASYNC)
+// LOADING STATE
 // ==================
 /**
- * Checks the backend to see if an email address is already registered.
- * @param {string} email - The email to check.
- * @returns {Promise<boolean>} True if the email exists, false otherwise.
+ * Bloquea o desbloquea el formulario de login.
+ * @param {boolean} isLoading - True para bloquear, false para desbloquear.
  */
-const searchEmail = async (email) => {
-  const data = { email: email };
+const setAuthFormLoading = (isLoading) => {
+  const authHeader = document.querySelector(".auth-header");
+  const authSub = document.querySelector(".auth-sub");
+  const authArticle = document.querySelector(".auth-article");
+  const spinnerContainer = document.querySelector("#spinner-container");
+  if (authArticle) {
+    authArticle.classList.add("hidden");
+    authHeader.textContent = "Just a second!";
+    authSub.textContent = "Checking, please wait...";
+    spinnerContainer.classList.remove("hidden");
+  }
 
-  try {
-    const response = await fetch(`${API_URL}/user/email`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+  // Deshabilita el botón de login normal
+  if (authButton) {
+    authButton.disabled = isLoading;
+    authButton.textContent = isLoading ? "Cargando..." : "Login";
+  }
 
-    const result = await response.json();
-
-    // If server responds with 500 (DB Error)
-    if (response.status === 500) {
-      console.error("Server error during email check:", result.message);
-      return false;
-    }
-
-    // If email exists (Status 200 and exists: true)
-    if (result.exists === true) {
-      return true;
-    }
-
-    // If email does NOT exist (Status 200 and exists: false)
-    return false;
-  } catch (error) {
-    console.error("Network or parsing error:", error);
-    // Network error handling: assume it doesn't exist if we can't confirm
-    return false;
+  // Oculta/muestra el botón de Google
+  const googleButton = document.querySelector(".g_id_signin");
+  if (googleButton) {
+    googleButton.style.display = isLoading ? "none" : "block";
   }
 };
 

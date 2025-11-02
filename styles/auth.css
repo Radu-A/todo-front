@@ -44,6 +44,11 @@
 
 /* Form Elements */
 
+/* show/hide */
+.hidden {
+  display: none !important;
+}
+
 .auth-form {
   display: flex;
   flex-direction: column;
