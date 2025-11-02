@@ -17,6 +17,14 @@ const nameAuthInput = document.getElementById("name-auth-input");
 const authButton = document.getElementById("auth-button");
 const loginForm = document.getElementById("login-form");
 const registerForm = document.getElementById("register-form");
+// ...después de const registerForm = ...
+const authHeader = document.querySelector(".auth-header");
+const authSub = document.querySelector(".auth-sub");
+const authArticle = document.querySelector(".auth-article"); // El formulario
+const statusContainer = document.querySelector("#status-container");
+const loadingSpinner = document.querySelector("#loading-spinner");
+const errorIcon = document.querySelector("#error-icon");
+const tryAgainButton = document.querySelector("#try-again-button");
 
 // ==================
 // VALIDATION HELPERS (Refactored)
@@ -275,10 +283,20 @@ const handleLogin = async () => {
     const baseUrl = `${window.location.origin}`;
     window.location.href = `${baseUrl}/index.html`;
   } catch (err) {
-    // ERROR HANDLING and Message Display
-    // Show the captured error message (e.g., "Invalid credentials")
     console.error("Login failed or network error:", err.message);
-    showLoginError(err.message);
+
+    // ANTES: showLoginError(err.message);
+
+    // AHORA: Llama a la nueva función de UI
+    if (err.message.includes("Failed to fetch")) {
+      showAuthFailure(
+        "server",
+        "Could not connect to the server. Please try again later."
+      );
+    } else {
+      // Asume que es un error de autenticación (ej. "Invalid credentials")
+      showAuthFailure("auth", err.message);
+    }
   }
 };
 
@@ -315,7 +333,7 @@ const handleRegister = async () => {
     email: emailAuthInput.value,
     password: passwordAuthInput.value,
   };
-  
+
   try {
     const response = await fetch(`${API_URL}/user`, {
       method: "POST",
@@ -335,10 +353,21 @@ const handleRegister = async () => {
     await handleLogin();
     // The handleLogin() function will handle the successful redirect.
     // No further action is needed here.
-  } catch (error) {
-    // 3. Catch and display the error message to the user
-    console.error("Registration failed:", error.message);
-    // Here you could call showLoginError() or a similar function for the register form
+  } catch (err) {
+    console.error("Login failed or network error:", err.message);
+
+    // ANTES: showLoginError(err.message);
+
+    // AHORA: Llama a la nueva función de UI
+    if (err.message.includes("Failed to fetch")) {
+      showAuthFailure(
+        "server",
+        "Could not connect to the server. Please try again later."
+      );
+    } else {
+      // Asume que es un error de autenticación (ej. "Invalid credentials")
+      showAuthFailure("auth", err.message);
+    }
   }
 };
 
@@ -387,9 +416,20 @@ const sendGoogleTokenToBackend = async (token) => {
     const baseUrl = `${window.location.origin}`;
     window.location.href = `${baseUrl}/index.html`;
   } catch (err) {
-    // Muestra el error (puedes reusar showLoginError)
     console.error("Google login failed:", err.message);
-    showLoginError("Error al iniciar sesión con Google.");
+
+    // ANTES: showLoginError("Error al iniciar sesión con Google.");
+
+    // AHORA: Llama a la nueva función de UI
+    if (err.message.includes("Failed to fetch")) {
+      showAuthFailure(
+        "server",
+        "Could not connect to Google's servers. Please try again."
+      );
+    } else {
+      // Asume un error de autenticación o de token
+      showAuthFailure("auth", err.message);
+    }
   }
 };
 
@@ -397,20 +437,69 @@ const sendGoogleTokenToBackend = async (token) => {
 // LOADING STATE
 // ==================
 /**
- * Bloquea o desbloquea el formulario de login.
- * @param {boolean} isLoading - True para bloquear, false para desbloquear.
+ * Gestiona la UI de autenticación para los estados de carga o reseteo.
+ * @param {boolean} isLoading - True para mostrar carga, false para resetear al formulario.
  */
 const setAuthFormLoading = (isLoading) => {
-  const authHeader = document.querySelector(".auth-header");
-  const authSub = document.querySelector(".auth-sub");
-  const authArticle = document.querySelector(".auth-article");
-  const spinnerContainer = document.querySelector("#spinner-container");
-  if (authArticle) {
+  if (isLoading) {
+    // 1. Ocultar el formulario
     authArticle.classList.add("hidden");
+
+    // 2. Mostrar el contenedor de estado
+    statusContainer.classList.remove("hidden");
+
+    // 3. Mostrar SÓLO el spinner
+    loadingSpinner.classList.remove("hidden");
+    errorIcon.classList.add("hidden");
+    tryAgainButton.classList.add("hidden");
+
+    // 4. Actualizar texto
     authHeader.textContent = "Just a second!";
     authSub.textContent = "Checking, please wait...";
-    spinnerContainer.classList.remove("hidden");
+  } else {
+    // ESTADO DE RESETEO (para el botón "Try Again")
+    // 1. Mostrar el formulario
+    authArticle.classList.remove("hidden");
+
+    // 2. Ocultar el contenedor de estado
+    statusContainer.classList.add("hidden");
+
+    // 3. Resetear textos (con soporte para ambas páginas)
+    if (loginForm) {
+      authHeader.textContent = "Hi there!";
+      authSub.textContent = "Welcome to ToDo List, happy to see you!";
+    } else {
+      authHeader.textContent = "Create an Account";
+      authSub.textContent = "It's free and only takes a minute.";
+    }
   }
+};
+
+/**
+ * Muestra un estado de error en la UI de autenticación.
+ * @param {string} errorType - "auth" (login/pass) o "server" (caída de red/500).
+ * @param {string} message - El mensaje de error específico a mostrar.
+ */
+const showAuthFailure = (errorType, message) => {
+  // 1. Ocultar el formulario (por si acaso)
+  authArticle.classList.add("hidden");
+
+  // 2. Mostrar el contenedor de estado
+  statusContainer.classList.remove("hidden");
+
+  // 3. Mostrar SÓLO el icono de error y el botón
+  loadingSpinner.classList.add("hidden");
+  errorIcon.classList.remove("hidden");
+  tryAgainButton.classList.remove("hidden");
+
+  // 4. Actualizar textos (requisito 2 y 5)
+  if (errorType === "auth") {
+    authHeader.textContent = "Oops! Login Failed";
+  } else {
+    // 'server'
+    authHeader.textContent = "Server Error";
+  }
+  authSub.textContent = message; // Muestra el mensaje de error específico
 };
 
 // ==================
@@ -459,3 +548,8 @@ if (registerForm) {
     }
   });
 }
+
+// Listener para el botón "Try Again"
+tryAgainButton.addEventListener("click", () => {
+  setAuthFormLoading(false); // Resetea la UI al formulario
+});
