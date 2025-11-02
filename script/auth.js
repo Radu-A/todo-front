@@ -2,9 +2,9 @@
 // VARIABLES
 // ==================
 // RELATIVE
-const API_URL = "/api";
+// const API_URL = "/api";
 // LOCAL
-// const API_URL = "http://localhost:5000/api";
+const API_URL = "http://localhost:5000/api";
 // KOYEB
 // const API_URL = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api";
 // RENDER
@@ -294,7 +294,11 @@ const showLoginError = (message) => {
   loginMessage.textContent = message;
   loginMessage.className = "validation-message";
   loginMessage.id = "login-message";
-  loginForm.appendChild(loginMessage);
+  if (loginForm) {
+    loginForm.appendChild(loginMessage);
+  } else {
+    registerForm.appendChild(loginMessage);
+  }
 };
 
 // ==================
@@ -311,7 +315,7 @@ const handleRegister = async () => {
     email: emailAuthInput.value,
     password: passwordAuthInput.value,
   };
-
+  
   try {
     const response = await fetch(`${API_URL}/user`, {
       method: "POST",
@@ -360,8 +364,6 @@ function handleGoogleCredentialResponse(response) {
 const sendGoogleTokenToBackend = async (token) => {
   // 1. INICIA EL ESTADO DE CARGA
   setAuthFormLoading(true);
-  // Muestra un mensaje (puedes reusar tu función showLoginError para esto)
-  showLoginError("Verificando, por favor espera...");
   try {
     const res = await fetch(`${API_URL}/auth/google`, {
       method: "POST",
@@ -408,18 +410,6 @@ const setAuthFormLoading = (isLoading) => {
     authHeader.textContent = "Just a second!";
     authSub.textContent = "Checking, please wait...";
     spinnerContainer.classList.remove("hidden");
-  }
-
-  // Deshabilita el botón de login normal
-  if (authButton) {
-    authButton.disabled = isLoading;
-    authButton.textContent = isLoading ? "Cargando..." : "Login";
-  }
-
-  // Oculta/muestra el botón de Google
-  const googleButton = document.querySelector(".g_id_signin");
-  if (googleButton) {
-    googleButton.style.display = isLoading ? "none" : "block";
   }
 };
 
