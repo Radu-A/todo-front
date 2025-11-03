@@ -22,11 +22,11 @@ const filterButtons = [...document.getElementsByClassName("filter-button")];
  */
 let taskList = [];
 // RELATIVE
-// const API_URL = "/api/tasks";
+const API_URL = "/api/tasks";
 // LOCAL
 // const API_URL = "http://localhost:5000/api/tasks";
 // KOYEB
-const API_URL = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api/tasks";
+// const API_URL = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api/tasks";
 // RENDER
 // const API_URL = "https://todo-server-1zx1.onrender.com/api/tasks";
 

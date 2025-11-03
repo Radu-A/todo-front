@@ -2,11 +2,11 @@
 // VARIABLES
 // ==================
 // RELATIVE
-// const API_URL = "/api";
+const API_URL = "/api";
 // LOCAL
 // const API_URL = "http://localhost:5000/api";
 // KOYEB
-const API_URL = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api";
+// const API_URL = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api";
 // RENDER
 // const API_URL = "https://todo-server-1zx1.onrender.com/api";
 
