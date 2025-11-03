@@ -2,9 +2,9 @@
 // VARIABLES
 // ==================
 // RELATIVE
-// const API_URL = "/api";
+const API_URL = "/api";
 // LOCAL
-const API_URL = "http://localhost:5000/api";
+// const API_URL = "http://localhost:5000/api";
 // KOYEB
 // const API_URL = "https://zealous-odele-radu-a-2bb4e20d.koyeb.app/api";
 // RENDER
@@ -254,6 +254,7 @@ const formValidation = async () => {
  * @returns {Promise<void>}
  */
 const handleLogin = async () => {
+  setAuthFormLoading(true);
   const data = {
     email: emailAuthInput.value,
     password: passwordAuthInput.value,
@@ -268,9 +269,22 @@ const handleLogin = async () => {
 
     // Handle Auth Failure (401/500)
     if (!res.ok) {
-      const errorData = await res.json();
-      // Throw the server's message for the catch block
-      throw new Error(errorData.message || `HTTP Error: ${res.status}`);
+      let errorMessage;
+      try {
+        // --- INICIO DE LA CORRECCIÓN ---
+        // 1. Intenta leer el error como JSON (lo que esperamos)
+        const errorData = await res.json();
+        errorMessage = errorData.message;
+      } catch (jsonError) {
+        // 2. Si falla el JSON.parse() (porque es HTML/texto),
+        //    usamos el texto de estado del servidor.
+        //    Esto captura el "Unexpected token 'T'"
+        errorMessage = `Server Error: ${res.status} (${res.statusText})`;
+        // --- FIN DE LA CORRECCIÓN ---
+      }
+
+      // Lanza el error (ya sea el del JSON o el genérico)
+      throw new Error(errorMessage || `HTTP Error: ${res.status}`);
     }
 
     // SUCCESS (Status 200)
@@ -328,6 +342,7 @@ const showLoginError = (message) => {
  * @returns {Promise<void>}
  */
 const handleRegister = async () => {
+  setAuthFormLoading(true);
   const data = {
     username: nameAuthInput.value,
     email: emailAuthInput.value,
@@ -335,17 +350,30 @@ const handleRegister = async () => {
   };
 
   try {
-    const response = await fetch(`${API_URL}/user`, {
+    const res = await fetch(`${API_URL}/user`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
     // 1. Check for non-2xx status codes (400, 409, 500)
-    if (!response.ok) {
-      const errorData = await response.json();
-      // Throw the message from the server (e.g., "This email is already registered")
-      throw new Error(errorData.message || `HTTP Error: ${response.status}`);
+    if (!res.ok) {
+      let errorMessage;
+      try {
+        // --- INICIO DE LA CORRECCIÓN ---
+        // 1. Intenta leer el error como JSON (lo que esperamos)
+        const errorData = await res.json();
+        errorMessage = errorData.message;
+      } catch (jsonError) {
+        // 2. Si falla el JSON.parse() (porque es HTML/texto),
+        //    usamos el texto de estado del servidor.
+        //    Esto captura el "Unexpected token 'T'"
+        errorMessage = `Server Error: ${res.status} (${res.statusText})`;
+        // --- FIN DE LA CORRECCIÓN ---
+      }
+
+      // Lanza el error (ya sea el del JSON o el genérico)
+      throw new Error(errorMessage || `HTTP Error: ${res.status}`);
     }
 
     // 2. SUCCESS (Status 201)
@@ -400,9 +428,24 @@ const sendGoogleTokenToBackend = async (token) => {
       body: JSON.stringify({ token: token }),
     });
 
+    // Handle Auth Failure (401/404/500)
     if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || `HTTP Error: ${res.status}`);
+      let errorMessage;
+      try {
+        // --- INICIO DE LA CORRECCIÓN ---
+        // 1. Intenta leer el error como JSON (lo que esperamos)
+        const errorData = await res.json();
+        errorMessage = errorData.message;
+      } catch (jsonError) {
+        // 2. Si falla el JSON.parse() (porque es HTML/texto),
+        //    usamos el texto de estado del servidor.
+        //    Esto captura el "Unexpected token 'T'"
+        errorMessage = `Server Error: ${res.status} (${res.statusText})`;
+        // --- FIN DE LA CORRECCIÓN ---
+      }
+
+      // Lanza el error (ya sea el del JSON o el genérico)
+      throw new Error(errorMessage || `HTTP Error: ${res.status}`);
     }
 
     // ÉXITO (Status 200)
