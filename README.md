@@ -1,83 +1,128 @@
 # 📝 ToDo List - My Day
 
-A simple task management app built with **HTML, CSS, and JavaScript**.  
-It allows you to create, edit, complete, and delete tasks, as well as filter between pending and completed tasks.  
-Data is stored in **LocalStorage**, so your tasks persist even after refreshing the page.
+A modern daily task management app built with **HTML, CSS, and JavaScript, fully connected to a Node.js, Express, and MongoDB backend**.
+It lets you create, edit, complete, delete, and reorder tasks while filtering between pending and completed ones.
+Includes user **authentication (email and Google) and secure data persistence using JWT**.
 
----
+## Live Demo
 
-## Screenshot
+🚀 The app is fully deployed and functional:
+👉 https://todo-front-mu.vercel.app/
 
-_Add a screenshot of the project here:_
+## 📸 Screenshots
 
-![App Screenshot](./assets/screenshots/screenshot.png)
+Add your screenshots or demo GIFs here:
 
----
+🧭 Main App (ToDo / Done):
+
+![App Screenshot](./assets/screenshots/screen-dnd.png)
+
+🔐 Login Screen:
+
+![App Screenshot](./assets/screenshots/screen-login.png)
 
 ## Table of Contents
 
-1. [Features](#-features)
-2. [Technologies](#-technologies)
-3. [Installation & Usage](#-installation--usage)
-4. [What I Learned](#-what-i-learned)
-5. [Future Improvements](#-future-improvements)
+1. [Features](#features)
+2. [Technologies](#technologies)
+3. [What I Learned](#what-i-learned)
+4. [Future Improvements](#future-improvements)
+5. [Acknowledgments](#acknowledgments)
+6. [Links](#links)
 
 ---
 
 ## Features
 
-- ✅ Add new tasks.
-- ✏️ Edit existing task names.
-- 🔄 Toggle task status (pending ↔ completed).
-- 🗑️ Delete tasks.
-- 🔍 Filter by **all**, **pending**, or **completed**.
-- 💾 Data persistence with **LocalStorage**.
-- 🎨 Smooth animations for adding and removing tasks.
+### Core Features
 
----
+✅ Create new tasks.
+
+✏️ Edit task names by clicking on them.
+
+🔄 Toggle status between pending ↔ completed.
+
+🗑️ Delete tasks with smooth animations.
+
+🔍 Filter by all, pending, or completed.
+
+🎨 CSS animations for adding and removing tasks.
+
+### Backend Integration
+
+💾 Data persistence in MongoDB through a hosted REST API (Render).
+
+⚙️ Full CRUD operations.
+
+🔑 Login and registration via email or Google OAuth.
+
+🔒 Secure sessions managed with JSON Web Tokens (JWT).
+
+🧲 Drag & Drop reordering of tasks using SortableJS.
 
 ## Technologies
 
-- **HTML5** for structure.
-- **CSS3** with variables and animations.
-- **Vanilla JavaScript** for logic and DOM manipulation.
-- **LocalStorage** for saving tasks in the browser.
+### Frontend
 
----
+HTML5 → semantic structure
 
-## Installation & Usage
+CSS3 → variables, transitions, and responsive design
 
-1. Clone this repository:
+Vanilla JavaScript (ES6+) → logic, events, and DOM manipulation
 
-   ```bash
-   git clone https://github.com/yourusername/todolist.git
+SortableJS → intuitive drag & drop with backend synchronization
 
-   ```
+LocalStorage + JWT → secure session and token handling
 
-2. Open the index.html file in your browser.
+### Backend (integration)
 
-3. Start organizing your day ✨
+Node.js + Express
+
+MongoDB / Mongoose
+
+JWT for authentication
+
+Hosting on Vercel for the front-end and on Koyeb for the back-end
 
 ## What I Learned
 
-This project helped me practice and deepen my knowledge of:
+This project helped me strengthen my skills in:
 
-- DOM manipulation: creating, updating, and removing nodes dynamically.
+✅ Frontend–backend integration using secure fetch requests and REST endpoints.
 
-- Advanced event handling: click, keydown, blur, animationend, and preventing default behaviors.
+🧩 Drag & drop mechanics with SortableJS and backend synchronization.
 
-- LocalStorage persistence: storing and retrieving data across sessions.
+🧠 Dynamic DOM manipulation with optimistic re-rendering.
 
-- Dynamic IDs and event re-assignment when editing tasks.
+🔐 User authentication with secure JWT handling and localStorage.
 
-- CSS animations integrated with JavaScript logic.
+🎨 CSS animations coordinated with JavaScript events (animationend, click, keydown, etc.).
 
 ## Future Improvements
 
-- Add drag & drop to reorder tasks.
+🌙 Dark/Light theme switch.
 
-- Implement quick search for tasks.
+🗂️ Quick search for tasks.
 
-- Save data to an API/remote server.
+📱 Enhanced mobile UI.
 
-- Add dark/light theme support.
+🔔 Task reminders or notifications.
+
+🌐 Internationalization (i18n) for multilingual support.
+
+## Acknowledgments
+
+Special thanks to **Inma Contreras**, my instructor from the Certificado de Profesionalidad IFCD0210 – Desarrollo de Aplicaciones con Tecnologías Web,
+for her guidance, inspiration, and constant encouragement throughout the learning process.
+
+I also want to thank my classmates for their collaboration, feedback, and support during the development of this project — your ideas and teamwork made this app much better. 🙌
+
+## Links
+
+🌍 Live App: https://todo-front-mu.vercel.app/
+
+💻 GitHub Repository: https://github.com/Radu-A/todo-front
+
+👤 My GitHub Profile: https://github.com/Radu-A
+
+💼 LinkedIn: https://www.linkedin.com/in/victor-outeiro/
